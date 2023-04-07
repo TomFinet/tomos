@@ -1,0 +1,6 @@
+./build/
+./toolchain/tools/*
+./build.sh
+
+./TODO.md
+./IDEA.md
