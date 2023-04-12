@@ -1,5 +1,5 @@
 ./build/
-./toolchain/tools/*
+./toolchain/tools/
 ./build.sh
 
 ./TODO.md

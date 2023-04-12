@@ -7,7 +7,7 @@
  * @member: the name of the member within the struct.
  */
 #define container_of(ptr, type, member) ({              \
-    const typeof( ((type *)0)->member )* mptr = (ptr);  \
+    const typeof( ((type *) 0)->member ) mptr = (ptr);  \
     (type *)(mptr - offsetof(type, member)); })
 
 #define list_entry(ptr, type, member) \

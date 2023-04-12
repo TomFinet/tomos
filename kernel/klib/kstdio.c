@@ -1,4 +1,4 @@
-#include <kstdio.h>
+#include <klib/kstdio.h>
 
 void printk(const char* str) {
 	while(*str != '\0') {
@@ -26,6 +26,7 @@ void vprintk(const char* str, va_list list) {
 		str++;
 
 		char buffer[256];
+		memset(&buffer, 0, sizeof(buffer));
 		char* c;
 		
 		uint32_t arg = va_arg(list, uint32_t);
@@ -35,9 +36,9 @@ void vprintk(const char* str, va_list list) {
 			c = itoa(arg, buffer, 2);
 		} else if(*str == 'h') {
 			c = itoa(arg, buffer, 16);
+		} else {
+			c = &buffer[arg];
 		}
-		
-		/// c could be uninitialised here
 		printk(c);
 		str++;
 	}

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdarg.h>
-
 #include <serial.h>
+#include <klib/kstring.h>
 
 void printk(const char* str);
 void fprintk(const char* str, ...);

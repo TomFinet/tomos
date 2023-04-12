@@ -1,13 +1,8 @@
-## Tomos: the OS made for Tom's by Tom's
+# Tomos: the OS made for Tom's by Tom's
 
-A simple pedagogical operating system for the x86 architecture using the Grub2 bootloader.
+A pedagogical operating system for the x86 architecture.
 
-## Directory structure.
-
-- *kernel*: the main kernel source.
-- *include*: the kernel header files.
-- *toolchain*: scripts for building the cross-compiling toolchain for tomos.
-- *scripts*: scripts for making a bootable image and running the image on qemu.
+## How to run it.
 
 ### Build the toolchain.
 
@@ -28,3 +23,10 @@ Run `make image`.
 ### Run on qemu.
 
 Run `make qemu`.
+
+## Directory structure.
+
+- *kernel*: the main kernel source.
+- *include*: the kernel header files.
+- *toolchain*: scripts for building the cross-compiling toolchain for tomos.
+- *scripts*: scripts for making a bootable image and running the image on qemu.

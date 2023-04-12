@@ -13,7 +13,7 @@
 #include <stdbool.h>
 
 #include <io.h>
-#include <kstdio.h>
+#include <klib/kstdio.h>
 #include <list.h>
 
 // using: https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_.231

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <stdint.h>
-#include <kstdio.h>
+#include <klib/kstdio.h>
 
-#define GDT_NUM_ENTRIES 5
+#define GDT_ENTRY_NUM 5
+#define FLAT_BASE     0x0
+#define FLAT_LIMIT    0xfffff
 
 // Each define here is for a specific flag in the descriptor.
 // Refer to the intel documentation for a description of what each one does.
@@ -48,22 +50,21 @@
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
                      SEG_PRIV(3)     | SEG_DATA_RDWR
 
-///
-typedef struct gdt_entry {
-    uint16_t segment_limit;
-    uint16_t low_base_address;
-    uint8_t  mid_base_address;
+struct gdt_entry {
+    uint16_t limit;
+    uint16_t base_low;
+    uint8_t  base_mid;
     uint16_t flags;
-    uint8_t  high_base_address;
-} __attribute__((packed)) gdt_entry_t;
+    uint8_t  base_high;
+} __attribute__ ((packed));
 
 ///
-typedef struct gdt_ptr {
+struct gdt_ptr {
     uint16_t limit;
-    uint32_t base; 
-} __attribute__((packed)) gdt_ptr_t;
+    uint32_t base;
+} __attribute__ ((packed));
 
 ///
 void gdt_init();
 
-extern void gdt_set(uint32_t gdtr_addr);
+extern void gdt_set(uint32_t gdt_addr);

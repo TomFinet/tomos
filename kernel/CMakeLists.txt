@@ -1,22 +1,23 @@
 ENABLE_LANGUAGE(C ASM)
 
-SET_SOURCE_FILES_PROPERTIES(
-	asm/boot.s
-	PROPERTIES LANGUAGE ASM
-)
-
-SET(CMAKE_C_FLAGS "-O2 -ffreestanding -fbuiltin -Wno-write-strings -Wall")
+SET(CMAKE_C_FLAGS "-O2 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone")
 
 SET(KERNEL_SRCS
-	asm/boot.s
-	asm/gdt.s
-	gdt.c
+	startup/boot.s
+	startup/gdt.s
+	startup/gdt.c
+
+	interrupts/idt.s
+	interrupts/isr.s
+	interrupts/idt.c
+	interrupts/isr.c
+
+	klib/kstdio.c
+	klib/kstring.c
+
 	io.c
 	serial.c
-	kstdio.c
-	pci.c
-	list.c
-	bochs_vga.c
+
 	kmain.c
 )
 

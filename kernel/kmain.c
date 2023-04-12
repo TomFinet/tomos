@@ -11,12 +11,15 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <gdt.h>
+#include <startup/gdt.h>
+#include <interrupts/idt.h>
 #include <serial.h>
 #include <pci.h>
-#include <bochs_vga.h>
  
 void kmain() {
-    gdt_init();
     serial_init();
+    gdt_init();
+    idt_init();
+    asm volatile ("int $0x1");
+    asm volatile ("int $0x1");
 }
