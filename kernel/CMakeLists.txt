@@ -3,9 +3,10 @@ ENABLE_LANGUAGE(C ASM)
 SET(CMAKE_C_FLAGS "-O2 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone")
 
 SET(KERNEL_SRCS
-	startup/boot.s
-	startup/gdt.s
-	startup/gdt.c
+	startup/startup.s
+	
+	memory/gdt.s
+	memory/gdt.c
 
 	interrupts/idt.s
 	interrupts/isr.s
