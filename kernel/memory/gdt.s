@@ -24,7 +24,6 @@
 # takes as parameter the base and limit for the gdtr
 gdt_set:
 	movl 4(%esp), %eax
-	cli
 	lgdt (%eax)
 
 	# whatever changes made to the gdt has no effect on
@@ -38,6 +37,5 @@ gdt_set:
 	mov %ax, %ss
 	jmp $0x08,$.flush # 0x08 is the offset into the code segment of the gdt
 .flush:
-	sti
 	ret
 
