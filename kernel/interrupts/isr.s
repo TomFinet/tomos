@@ -8,21 +8,19 @@ exception_common:
 	mov %ds, %ax
 	push %eax		# save data segment on the stack
 
-	/**mov $0x10, %ax 	# load kernel data segment
+	mov $0x10, %ax 	# load kernel data segment
 	mov %ax, %ds
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
-	mov %ax, %ss**/
 
 	call exception_handler
 
 	pop %eax
-	/**mov %ax, %ds 	# restore the data segment
+	mov %ax, %ds 	# restore the data segment
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
-	mov %ax, %ss**/
 
 	popa
 
@@ -82,7 +80,7 @@ exception_no_err 31
 
 # interrupts
 
-/**.extern irq_handler
+.extern irq_handler
 
 irq_common:
 	pusha
@@ -95,7 +93,6 @@ irq_common:
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
-	mov %ax, %ss
 
 	call irq_handler
 
@@ -104,7 +101,6 @@ irq_common:
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
-	mov %ax, %ss
 
 	popa
 
@@ -129,4 +125,11 @@ irq 4
 irq 5
 irq 6
 irq 7
-*/
+irq 8
+irq 9
+irq 10
+irq 11
+irq 12
+irq 13
+irq 14
+irq 15

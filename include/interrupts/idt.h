@@ -30,7 +30,7 @@
 struct idt_gate {
 	uint16_t offset_low;
 	uint16_t segment_selector;
-	uint8_t  always0;
+	uint8_t  zero;
 	uint8_t  flags;
 	uint16_t offset_high;
 } __attribute__ ((packed))
@@ -89,3 +89,11 @@ extern void irq4();
 extern void irq5();
 extern void irq6();
 extern void irq7();
+extern void irq8();
+extern void irq9();
+extern void irq10();
+extern void irq11();
+extern void irq12();
+extern void irq13();
+extern void irq14();
+extern void irq15();
