@@ -26,7 +26,7 @@ void vprintk(const char* str, va_list list) {
 		str++;
 
 		char buffer[256];
-		memset(&buffer, 0, sizeof(buffer));
+		bzero(&buffer, sizeof(buffer));
 		char* c;
 		
 		uint32_t arg = va_arg(list, uint32_t);

@@ -5,7 +5,7 @@ struct idt_gate gates[IDT_GATE_NUM];
 void idt_create_descriptor(uint8_t i, uint32_t offset, uint16_t ss, uint8_t flags) {
 	gates[i].offset_low = offset & 0xffff;
 	gates[i].segment_selector = ss;
-	gates[i].always0 = 0;
+	gates[i].zero = 0;
 	gates[i].flags = flags;
 	gates[i].offset_high = offset >> 16;
 }
@@ -47,14 +47,14 @@ void idt_init() {
 	idt_create_descriptor(30, (uint32_t) isr30, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(31, (uint32_t) isr31, 0x08, INTERRUPT_FLAGS);
 
-	/**idt_create_descriptor(IDT_IRQ0 + 0, (uint32_t) irq0, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 0, (uint32_t) irq0, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 1, (uint32_t) irq1, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 2, (uint32_t) irq2, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 3, (uint32_t) irq3, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 4, (uint32_t) irq4, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 5, (uint32_t) irq5, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 6, (uint32_t) irq6, 0x08, INTERRUPT_FLAGS);
-	idt_create_descriptor(IDT_IRQ0 + 7, (uint32_t) irq7, 0x08, INTERRUPT_FLAGS);*/
+	idt_create_descriptor(IDT_IRQ0 + 7, (uint32_t) irq7, 0x08, INTERRUPT_FLAGS);
 	
 	idt_set((uint32_t) &idtr);
 }

@@ -11,15 +11,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <startup/gdt.h>
+#include <memory/gdt.h>
 #include <interrupts/idt.h>
 #include <serial.h>
-#include <pci.h>
- 
+
 void kmain() {
     serial_init();
     gdt_init();
     idt_init();
     asm volatile ("int $0x1");
-    asm volatile ("int $0x1");
+    asm volatile ("int $0x20");
 }

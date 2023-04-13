@@ -1,10 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <interrupts/pic.h>
 #include <klib/kstdio.h>
-
-#define IRQ0 32
 
 /// view of the stack frame setup by an interrupt
 struct interrupt_frame {
