@@ -55,6 +55,14 @@ void idt_init() {
 	idt_create_descriptor(IDT_IRQ0 + 5, (uint32_t) irq5, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 6, (uint32_t) irq6, 0x08, INTERRUPT_FLAGS);
 	idt_create_descriptor(IDT_IRQ0 + 7, (uint32_t) irq7, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 8, (uint32_t) irq8, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 9, (uint32_t) irq9, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 10, (uint32_t) irq10, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 11, (uint32_t) irq11, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 12, (uint32_t) irq12, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 13, (uint32_t) irq13, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 14, (uint32_t) irq14, 0x08, INTERRUPT_FLAGS);
+	idt_create_descriptor(IDT_IRQ0 + 15, (uint32_t) irq15, 0x08, INTERRUPT_FLAGS);
 	
 	idt_set((uint32_t) &idtr);
 }

@@ -17,6 +17,8 @@
 # and limit 0xfffff
 # for the full details see intel manuals page 3095
 
+.section .text
+.align 16
 .global gdt_set
 
 # tells the cpu the location of gdt table in
@@ -25,7 +27,9 @@
 gdt_set:
 	movl 4(%esp), %eax
 	lgdt (%eax)
-
+.b1:
+	jmp $0x08, $.reload # 0x08 is the offset into the code segment of the gdt
+.reload:
 	# whatever changes made to the gdt has no effect on
 	# the cpu until you load new segment selectors into
 	# segment registers.
@@ -35,7 +39,5 @@ gdt_set:
 	mov %ax, %fs
 	mov %ax, %gs
 	mov %ax, %ss
-	jmp $0x08,$.flush # 0x08 is the offset into the code segment of the gdt
-.flush:
 	ret
 
