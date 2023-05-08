@@ -13,6 +13,4 @@ TOMOS_QEMU_ARGS="
   -m 512M
   -serial mon:stdio"
 
-# -serial vc
-
 ${TOMOS_QEMU} ${TOMOS_QEMU_ARGS}
