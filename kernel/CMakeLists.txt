@@ -1,6 +1,6 @@
 ENABLE_LANGUAGE(C ASM)
 
-SET(CMAKE_C_FLAGS "-O2 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone")
+SET(CMAKE_C_FLAGS "-O2 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone -g")
 
 SET(KERNEL_SRCS
 	startup/startup.s
