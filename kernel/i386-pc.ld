@@ -1,43 +1,46 @@
-/* The bootloader will look at this image and start execution at the symbol
-   designated as the entry point. */
+/**
+ * Higher-quarter kernel.
+ * Virtual address base is 0xc0100000
+ * load address is 1MiB = 0x00100000 because grub exists below there.
+ */
+
 ENTRY(_start)
- 
-/* Tell where the various sections of the object files will be put in the final
-   kernel image. */
+
+_higher_start = 0xc0000000;
+
 SECTIONS
 {
-	/* Begin putting sections at 1 MiB, a conventional place for kernels to be
-	   loaded at by the bootloader. */
-	. = 1M;
- 
-	/* First put the multiboot header, as it is required to be put very early
-	   early in the image or the bootloader won't recognize the file format.
-	   Next we'll put the .text section. */
-	.text BLOCK(4K) : ALIGN(4K)
-	{
+	. = 2M;
+	_kernel_physical_start = .;
+
+	.early : ALIGN(4K) {
 		*(.multiboot)
+		*(.text.low)
+	}
+
+	.bss.pagetables : ALIGN(4K) {
+		*(.bss.pagatables)
+	}
+
+	. += _higher_start;
+	_kernel_virtual_start = .;
+
+	.text ALIGN(4K) : AT(ADDR(.text) - _higher_start) {
 		*(.text)
 	}
  
-	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
+	.rodata ALIGN(4K) : AT(ADDR(.rodata) - _higher_start) { 
 		*(.rodata)
 	}
  
-	/* Read-write data (initialized) */
-	.data BLOCK(4K) : ALIGN(4K)
-	{
+	.data ALIGN(4K) : AT(ADDR(.data) - _higher_start) {
 		*(.data)
 	}
  
-	/* Read-write data (uninitialized) and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
-	{
+	.bss ALIGN(4K) : AT(ADDR(.bss) - _higher_start) {
 		*(COMMON)
 		*(.bss)
 	}
- 
-	/* The compiler may produce other sections, by default it will put them in
-	   a segment with the same name. Simply add stuff here as needed. */
+
+	_kernel_virtual_end = .;
 }
