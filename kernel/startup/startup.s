@@ -7,7 +7,7 @@
 .set kernel_virtual_start, 0xc0000000
 .set kernel_page_dir, kernel_virtual_start >> 22
 
-.extern kmain
+.extern kentry
 
 .section .multiboot
 .align 4
@@ -18,17 +18,18 @@
 .section .bss.pagetables
 .align 4096
 
-page_dir_start:
+.global _page_dir
+_page_dir:
 	.fill kernel_page_dir, 4, 0
 kernel_page_dir_start:
 	.fill (1024 - kernel_page_dir), 4, 0
 
-identity_page_table:
-	.fill 1024, 4, 0
-
 kernel_page_table_0:
 	.fill 1024, 4, 0
 kernel_page_table_1:
+	.fill 1024, 4, 0
+
+identity_page_table:
 	.fill 1024, 4, 0
 
 .section .text.low
@@ -41,7 +42,7 @@ _start:
 	call map_page_table
 
 	orl $3, %eax
-	movl %eax, page_dir_start
+	movl %eax, _page_dir
 
 	# higher quarter kernel mapping
 	movl $kernel_page_table_0, %eax
@@ -59,7 +60,7 @@ _start:
 	movl %eax, kernel_page_dir_start + 4 
 
 	# set page directory in cr3
-	movl $page_dir_start, %eax
+	movl $_page_dir, %eax
 	movl %eax, %cr3
 
 	# CR0.PE = 1 already since grub puts us in protected mode 
@@ -85,12 +86,12 @@ next:
 .section .text
 
 kernel_higher:
-	movl $0, page_dir_start 
+	movl $0, _page_dir
 	invlpg 0
 
 	movl $stack_top, %esp
 	
-	call kmain
+	call kentry
 
 	cli
 	1: hlt
@@ -99,7 +100,13 @@ kernel_higher:
 
 .section .bss 
 .align 16
+
+# grows from high to low address
 stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
 
+# from here to the end of virtual address space,
+# memory should be managed by virtual memory manager
+.global kheap_start
+kheap_start:

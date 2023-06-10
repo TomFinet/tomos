@@ -4,6 +4,13 @@
  * load address is 1MiB = 0x00100000 because grub exists below there.
  */
 
+#define LINK_KTEST() \
+	. = ALIGN(4); \
+	_ktest_start = .; \
+	KEEP(*(.ktest)) \
+	_ktest_end = .;
+	
+
 ENTRY(_start)
 
 _higher_start = 0xc0000000;
@@ -12,6 +19,7 @@ SECTIONS
 {
 	. = 2M;
 	_kernel_physical_start = .;
+	_kernel_virtual_start = . + _higher_start;
 
 	.early : ALIGN(4K) {
 		*(.multiboot)
@@ -23,18 +31,22 @@ SECTIONS
 	}
 
 	. += _higher_start;
-	_kernel_virtual_start = .;
-
+	
 	.text ALIGN(4K) : AT(ADDR(.text) - _higher_start) {
+		_kernel_text_start = .;
 		*(.text)
+		_kernel_text_end = .;
 	}
- 
+	
 	.rodata ALIGN(4K) : AT(ADDR(.rodata) - _higher_start) { 
 		*(.rodata)
 	}
  
 	.data ALIGN(4K) : AT(ADDR(.data) - _higher_start) {
 		*(.data)
+		#ifdef KTESTS
+			LINK_KTEST()
+		#endif
 	}
  
 	.bss ALIGN(4K) : AT(ADDR(.bss) - _higher_start) {
@@ -42,5 +54,6 @@ SECTIONS
 		*(.bss)
 	}
 
+	_kernel_physical_end = . - _higher_start;
 	_kernel_virtual_end = .;
 }
