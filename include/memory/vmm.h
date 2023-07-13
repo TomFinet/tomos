@@ -26,23 +26,29 @@ SOFTWARE.
 
 #pragma once
 
-#include <stdint.h>
+#include <stddef.h>
 
-/* I/O functions specific to the x86 ISA */
+#include <list.h>
+#include <memory/paging.h>
 
-// write a word to the port.
-void outb(uint16_t port, uint8_t value);
+/* Kernel's virtual memory manager, implementing a crappy kmalloc. */
 
-// write a word to the port.
-// should be 2 byte aligned port number.
-void outw(uint16_t port, uint16_t value);
+// TODO: optimise virtual memory allocation for networking.
 
-// write a double-word to the port.
-// should be 4 byte aligned port number.
-void outl(uint16_t port, uint32_t value);
+// Descrribes a free contiguous virtual memory area
+// (vma), embedded in memory at the start of each vma.
+// size refers to the number of bytes in the vma
+// excluding this header.
+struct free_vma_t {
+	uint32_t size;
+	struct list_head list;
+};
 
-uint8_t inb(uint16_t port);
+/* Dynamically allocated kernel virtual memory is managed starting from here. */
+extern va_t _kheap_start __attribute__((aligned(PAGE_NBYTES)));
 
-uint16_t inw(uint16_t port);
+void vmm_init();
 
-uint32_t inl(uint16_t port);
+/// Allocate a contiguous block of memory
+/// in kernel space of the specified size.
+va_t vmm_alloc_kheap(uint32_t size);

@@ -105,8 +105,3 @@ kernel_higher:
 stack_bottom:
 .skip 16384 # 16 KiB
 stack_top:
-
-# from here to the end of virtual address space,
-# memory should be managed by virtual memory manager
-.global kheap_start
-kheap_start:

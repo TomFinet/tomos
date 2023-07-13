@@ -10,7 +10,6 @@
 	KEEP(*(.ktest)) \
 	_ktest_end = .;
 	
-
 ENTRY(_start)
 
 _higher_start = 0xc0000000;
@@ -52,6 +51,8 @@ SECTIONS
 	.bss ALIGN(4K) : AT(ADDR(.bss) - _higher_start) {
 		*(COMMON)
 		*(.bss)
+    . = ALIGN(4);
+    _kheap_start = .;
 	}
 
 	_kernel_physical_end = . - _higher_start;

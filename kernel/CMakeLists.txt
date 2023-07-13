@@ -29,6 +29,7 @@ if(KTESTS)
 	SET(ENTRY_SRCS
 		tests/ktest.c
 		tests/memory/mm_tests.c
+    tests/memory/paging_tests.c
 		tests/ktest_entry.c
 	)
 else()

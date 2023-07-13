@@ -26,23 +26,35 @@ SOFTWARE.
 
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
+#include <stddef.h>
 
-/* I/O functions specific to the x86 ISA */
+#include <klib/kstdio.h>
 
-// write a word to the port.
-void outb(uint16_t port, uint8_t value);
+/* Kernel's physical memory manager, implementing single page frame allocation. */
 
-// write a word to the port.
-// should be 2 byte aligned port number.
-void outw(uint16_t port, uint16_t value);
+#define SYSTEM_MEM 0x20000000 /* 512 MiB */
 
-// write a double-word to the port.
-// should be 4 byte aligned port number.
-void outl(uint16_t port, uint32_t value);
+#define FRAME_NBYTES 4096
+#define FRAME_SHIFT 12
+#define FRAME_COUNT (SYSTEM_MEM >> FRAME_SHIFT)
+#define FRAME_IDX(pa) (pa / FRAME_NBYTES)
+#define FRAME_PA(idx) (FRAME_NBYTES * (idx))
 
-uint8_t inb(uint16_t port);
+#define MEM_MAP_BLOCK_NBITS	32
+#define MEM_MAP_BLOCK_SHIFT 4
+#define MEM_MAP_BLOCK_FULL 0xffffffff
+#define MEM_MAP_BLOCK_COUNT (FRAME_COUNT >> MEM_MAP_BLOCK_SHIFT)
 
-uint16_t inw(uint16_t port);
+/// where the compile time parts of the kernel start and end in physical memory
+extern uint32_t _kernel_physical_start;
+extern uint32_t _kernel_physical_end;
 
-uint32_t inl(uint16_t port);
+void mm_init(void);
+
+/// returns the start physical address of the free frame
+uint32_t alloc_frame();
+
+/// we could accidentally have duplicate frames
+void free_frame(uint32_t frame_paddr);
