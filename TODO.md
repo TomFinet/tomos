@@ -1,29 +1,23 @@
-Roadmap:
+TODO:
+-----
 
-- interrupts, and synchronisation setup
-	- What are maskable interrupts?
-- paging and memory management (malloc and free)
-- proper console
+- add clang-tidy to the project in order to define a coding style.
 
+- finish v1 of uniprocessor memory management system.
 
-Memory management:
-------------------
+- right now, when a page is requested, it is mapped into the
+  page table with an associated physical frame of memory.
+  We may prefer to map the page, but wait to allocate the
+  physical frame until the page is read or written to,
+  i.e. demand paging.
 
-We use a flat memory model with paging for the following reasons:
+- synchronisation primitives.
 
-	- simpler: each process in same linear address space, but linear addresses can be mapped to any physical address, as opposed to 	giving each process its own linear address space.
-	- more portable to isa that do not use segmentation.
+- NULL is defined as 0, so we need to unmap the first
+  0-4KiB of virtual memory so that a NULL reference 
+  causes a page table exception.
 
-Read about setting up the gdt for flat memory model.
-Read about paging in x86.
-Figure out the physical memory map of our system.
-Figure out the virtual memory map of our system.
+- parse multiboot info passed in by %ebx
 
-Console:
---------
-
-We need to enumerate the PCI buses and try to detect a Bochs vga device.
-
-We basically need a printk up and running asap.
-
-Then get interrupts working so that we can detect and print system exceptions and faults.
+- tests should be self-contained and clean up after themselves.
+  perhaps per-test config and cleanup functions are useful.

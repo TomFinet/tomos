@@ -1,6 +1,10 @@
-# Tomos: the OS made for Tom's by Tom's
+# Tomos: easy to use x86 memory management kernel 
 
-A pedagogical operating system for the x86 architecture.
+A x86 memory manager which has:
+
+- [x] page-frame allocator.
+- [x] SLAB allocator.
+- [x] unit tests.
 
 ## How to run it.
 
@@ -12,17 +16,13 @@ Run `./toolchain/build_toolchain.sh`.
 
 Run `mkdir -p build` and then `cd build && cmake .. -DCMAKE_TOOLCHAIN_FILE=toolchain/CMakeToolchain.txt`.
 
-### Build the kernel.
+### Build and run the kernel with QEMU
 
-From `build/`, run `make install`.
+Run the `clean_install.sh` script.
 
-### Create the bootable kernel image.
+### Run the unit tests
 
-Run `make image`.
-
-### Run on qemu.
-
-Run `make qemu`.
+Run the `build_tests.sh` script.
 
 ## Directory structure.
 
