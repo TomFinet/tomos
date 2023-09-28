@@ -1,73 +1,46 @@
 /*
-
-MIT License
-
-Copyright (c) 2023 Tom Finet
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-*/
-
-/**
  * We have three types of gates in the interrupt descriptor table:
- * 
- * 		1. interrupt: these point to an interrupt handler. interrupts are called asynchronously
- * 		   by external hardware. the processor state is saved so that execution can resume after
- * 		   the interrupt handler has finished executing.
- * 		2. trap: traps are exceptions triggered immediately after executing a trapping instruction.
- * 		   thus traps are synchronous and execution resumes after the trap handler.
- * 		3. task: 
+ *
+ * 		1. interrupt: these point to an interrupt handler. interrupts
+ * are called asynchronously by external hardware. the processor state is saved
+ * so that execution can resume after the interrupt handler has finished
+ * executing.
+ * 		2. trap: traps are exceptions triggered immediately after
+ * executing a trapping instruction. thus traps are synchronous and execution
+ * resumes after the trap handler.
+ * 		3. task:
  */
 
 #pragma once
 
+#include <interrupts/pic.h>
 #include <klib/kstdio.h>
 #include <klib/kstring.h>
-#include <interrupts/pic.h>
 
 #define IDT_GATE_NUM 256
-#define IDT_IRQ0 32
+#define IDT_IRQ0     32
 
 #define GATE_PRES(x) ((x) << 7)
 #define GATE_DPL(x)  ((x) << 5)
 #define GATE_SIZE(x) ((x) << 3)
 
 #define TASK_FLAGS      (GATE_PRES(1) | GATE_DPL(0) | GATE_SIZE(1) | 0b101)
-#define INTERRUPT_FLAGS	(GATE_PRES(1) | GATE_DPL(0) | GATE_SIZE(1) | 0b110)
+#define INTERRUPT_FLAGS (GATE_PRES(1) | GATE_DPL(0) | GATE_SIZE(1) | 0b110)
 #define TRAP_FLAGS      (GATE_PRES(1) | GATE_DPL(0) | GATE_SIZE(1) | 0b111)
 
 /// 8-byte aligned for improved cache line fill.
 struct idt_gate {
 	uint16_t offset_low;
 	uint16_t segment_selector;
-	uint8_t  zero;
-	uint8_t  flags;
+	uint8_t zero;
+	uint8_t flags;
 	uint16_t offset_high;
-} __attribute__ ((packed))
-  __attribute__ ((aligned (8)));
-
+} __attribute__((packed)) __attribute__((aligned(8)));
 
 struct idt_ptr {
 	uint16_t limit;
 	uint32_t base;
-} __attribute__ ((packed));
-
+} __attribute__((packed));
 
 void idt_init();
 

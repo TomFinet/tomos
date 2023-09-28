@@ -1,14 +1,16 @@
 #include <klib/kstdio.h>
 
-void printk(const char* str) {
-	while(*str != '\0') {
+void printk(const char *str)
+{
+	while (*str != '\0') {
 		serial_write(*str);
 		str++;
 	}
 }
 
 /// formatted printk
-void fprintk(const char* str, ...) {
+void fprintk(const char *str, ...)
+{
 	va_list ap;
 	va_start(ap, str);
 	vprintk(str, ap);
@@ -16,9 +18,10 @@ void fprintk(const char* str, ...) {
 }
 
 /// outputs a formatted string to serial port.
-void vprintk(const char* str, va_list list) {
-	while(*str != '\0') {
-		if(*str != '%') {
+void vprintk(const char *str, va_list list)
+{
+	while (*str != '\0') {
+		if (*str != '%') {
 			serial_write(*str);
 			str++;
 			continue;
@@ -27,14 +30,14 @@ void vprintk(const char* str, va_list list) {
 
 		char buffer[256];
 		bzero(&buffer, sizeof(buffer));
-		char* c;
-		
+		char *c;
+
 		uint32_t arg = va_arg(list, uint32_t);
-		if(*str == 'd') {
+		if (*str == 'd') {
 			c = itoa(arg, buffer, 10);
-		} else if(*str == 'b') {
+		} else if (*str == 'b') {
 			c = itoa(arg, buffer, 2);
-		} else if(*str == 'h') {
+		} else if (*str == 'h') {
 			c = itoa(arg, buffer, 16);
 		} else {
 			c = &buffer[arg];
@@ -46,19 +49,20 @@ void vprintk(const char* str, va_list list) {
 
 /// doesn't belong in kstdio.c
 /// could be optimised for different bases, but oh well...
-char* itoa(uint32_t n, char* str, uint8_t base) {
+char *itoa(uint32_t n, char *str, uint8_t base)
+{
 	int32_t i = -1;
 	uint32_t tmp = n;
-	
-	while(tmp > 0) {
+
+	while (tmp > 0) {
 		i++;
 		tmp /= base;
 	}
 
 	*(str + i + 1) = '\0';
-	while(n > 0) {
+	while (n > 0) {
 		char r = n % base + '0';
-		if(r > '9') {
+		if (r > '9') {
 			r += 'A' - '9' - 1;
 		}
 		*(str + i) = r;

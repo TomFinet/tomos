@@ -1,6 +1,8 @@
 #include <panic.h>
 
-void kpanic(void) {
+void kpanic(void)
+{
 	printk("Kernel panic!!!");
-	for(;;) { }
+	for (;;) {
+	}
 }

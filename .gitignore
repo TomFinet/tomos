@@ -1,6 +1,7 @@
-./build/
-./toolchain/tools/
-./build.sh
+build/
+build/*
+toolchain/tools/
+toolchain/tools/*
 
-./TODO.md
-./IDEA.md
+TODO.md
+IDEA.md

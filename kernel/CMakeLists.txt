@@ -9,7 +9,9 @@ SET(KERNEL_SRCS
 	memory/gdt.c
 	memory/mm.c
 	memory/paging.c
-	memory/vmm.c
+	memory/kheap.c
+  	memory/kslab.c
+  	memory/vmm.c
 
 	interrupts/idt.s
 	interrupts/isr.s
@@ -18,6 +20,7 @@ SET(KERNEL_SRCS
 
 	klib/kstdio.c
 	klib/kstring.c
+  	klib/kmath.c
 
 	io.c
 	serial.c
@@ -29,7 +32,10 @@ if(KTESTS)
 	SET(ENTRY_SRCS
 		tests/ktest.c
 		tests/memory/mm_tests.c
-    tests/memory/paging_tests.c
+    	tests/memory/paging_tests.c
+    	tests/memory/kheap_tests.c
+    	tests/memory/kslab_tests.c
+    	tests/memory/vmm_tests.c
 		tests/ktest_entry.c
 	)
 else()

@@ -51,7 +51,7 @@ SECTIONS
 	.bss ALIGN(4K) : AT(ADDR(.bss) - _higher_start) {
 		*(COMMON)
 		*(.bss)
-    . = ALIGN(4);
+    . = ALIGN(0x1000);
     _kheap_start = .;
 	}
 
