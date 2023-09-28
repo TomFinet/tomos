@@ -23,7 +23,7 @@ ADD_CUSTOM_TARGET(image
 )
 
 ADD_CUSTOM_TARGET(qemu
-	COMMAND ${CMAKE_SOURCE_DIR}/scripts/qemu.sh
+	COMMAND ${CMAKE_SOURCE_DIR}/scripts/qemu.sh -d
 	USES_TERMINAL
 )
 
