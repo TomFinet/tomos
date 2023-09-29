@@ -95,7 +95,7 @@ static struct ktest_suite_t kslab_suite = {
 	.init = suite_init,
 	.exit = suite_exit,
 	.cases = kslab_cases,
-	.num_cases = (sizeof(kslab_cases) / sizeof(struct ktest_case_t)),
+	.num_cases = KTEST_NUM_CASES(kslab_cases),
 };
 
 KTEST_SUITE(kslab_suite);

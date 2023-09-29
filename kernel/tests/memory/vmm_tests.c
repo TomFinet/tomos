@@ -35,7 +35,7 @@ static struct ktest_suite_t vmm_suite = {
 	.init = suite_init,
 	.exit = suite_exit,
 	.cases = vmm_cases,
-	.num_cases = (sizeof(vmm_cases) / sizeof(struct ktest_case_t)),
+	.num_cases = KTEST_NUM_CASES(vmm_cases),
 };
 
 KTEST_SUITE(vmm_suite);

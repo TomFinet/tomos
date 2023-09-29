@@ -40,7 +40,7 @@ static struct ktest_suite_t kheap_suite = {
 	.init = suite_init,
 	.exit = suite_exit,
 	.cases = kheap_cases,
-	.num_cases = (sizeof(kheap_cases) / sizeof(struct ktest_case_t)),
+	.num_cases = KTEST_NUM_CASES(kheap_cases),
 };
 
 KTEST_SUITE(kheap_suite);

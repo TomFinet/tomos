@@ -43,7 +43,7 @@ static struct ktest_suite_t paging_suite = {
 	.init = suite_init,
 	.exit = suite_exit,
 	.cases = paging_cases,
-	.num_cases = (sizeof(paging_cases) / sizeof(struct ktest_case_t)),
+	.num_cases = KTEST_NUM_CASES(paging_cases),
 };
 
 KTEST_SUITE(paging_suite);

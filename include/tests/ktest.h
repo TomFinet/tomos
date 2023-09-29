@@ -19,6 +19,8 @@
 		__attribute__((section(".ktest"))) __attribute__((used)) =     \
 			&suite;
 
+#define KTEST_NUM_CASES(cases) (sizeof(cases) / sizeof(struct ktest_case_t))
+
 // TODO: don't like the global state
 extern bool curr_test_passing;
 #define ASSERT(b)                                                              \
