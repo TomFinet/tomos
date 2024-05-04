@@ -76,19 +76,41 @@ static void test_kcache_alloc_and_free_obj(void)
 		ASSERT(slab->free_objs[i] != (va_t)obj);
 	}
 
+	ASSERT(container_of(cache_test.slab_partial.next, struct kslab_t,
+			    list) == slab);
+
 	prior_freenum = slab->freenum;
-	kcache_free(&cache_test, obj);
+	kcache_free(slab, obj);
 	after_freenum = slab->freenum;
 
 	ASSERT(prior_freenum == after_freenum - 1);
 	ASSERT(slab->free_objs[prior_freenum] == (va_t)obj);
+
+	ASSERT(container_of(cache_test.slab_free.next, struct kslab_t, list) ==
+	       slab);
+}
+
+static void test_kcache_bulk_alloc_free(void)
+{
+	struct kslab_t *slab = kcache_grow(&cache_test, 1);
+
+	const int capacity = slab->freenum;
+	va_t *alloced = kheap_extend();
+	for (int i = 0; i < capacity; i++) {
+		alloced[i] = (va_t)kcache_alloc(&cache_test);
+	}
+
+	for (int i = 0; i < capacity; i++) {
+		kcache_free(slab, (void *)alloced[i]);
+		ASSERT(slab->freenum == i + 1);
+		ASSERT(slab->free_objs[i] == alloced[i]);
+	}
 }
 
 static struct ktest_case_t kslab_cases[] = {
-	KTEST(test_kcache_grow),
-	KTEST(test_page_descr_knows_slab),
+	KTEST(test_kcache_grow), KTEST(test_page_descr_knows_slab),
 	KTEST(test_kcache_alloc_and_free_obj),
-};
+	KTEST(test_kcache_bulk_alloc_free)};
 
 static struct ktest_suite_t kslab_suite = {
 	.name = "kslab_suite",

@@ -9,7 +9,8 @@ void *kmalloc(size_t nbytes)
 	return NULL;
 }
 
-int kfree(void *objp)
+void kfree(void *obj)
 {
-	return 0;
+	struct kslab_t *slab = page_descriptor(obj)->slab;
+	kcache_free(slab, obj);
 }

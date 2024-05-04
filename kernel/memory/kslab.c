@@ -64,6 +64,7 @@ struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
 	slab_free->slab_mem =
 		(va_t)slab_free + KSLAB_HEADER_SIZE(slab_free, cache->objsize);
 
+	slab_free->belongs_to = cache;
 	slab_free->list.next = &slab_free->list;
 	slab_free->list.prev = &slab_free->list;
 	list_add(&cache->slab_free, &slab_free->list);
@@ -117,10 +118,9 @@ void *kcache_alloc(struct kcache_t *cache)
 	return obj;
 }
 
-void kcache_free(struct kcache_t *cache, void *obj)
+void kcache_free(struct kslab_t *slab, void *obj)
 {
-
-	struct kslab_t *slab = page_descriptor(obj)->slab;
+	struct kcache_t *cache = slab->belongs_to;
 	slab->free_objs[slab->freenum] = (va_t)obj;
 	slab->freenum++;
 

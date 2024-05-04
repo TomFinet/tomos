@@ -53,6 +53,7 @@ allocated to the slab. */
 struct kslab_t {
 	/* the slab list this slab belongs to. */
 	struct list_head list;
+	struct kcache_t *belongs_to;
 	/* the start address of the contiguous number of pages. */
 	va_t slab_mem;
 	/* the number of contiguous pages in the slab. */
@@ -71,7 +72,7 @@ void kcache_add(struct kcache_t *cache);
 
 void *kcache_alloc(struct kcache_t *cache);
 
-void kcache_free(struct kcache_t *cache, void *obj);
+void kcache_free(struct kslab_t *slab, void *obj);
 
 /* grow the slab by some number of pages. */
 struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum);

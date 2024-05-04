@@ -8,4 +8,4 @@
 void *kmalloc(size_t nbytes);
 
 /* Free the object */
-int kfree(void *objp);
+void kfree(void *objp);
