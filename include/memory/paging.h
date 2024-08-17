@@ -2,14 +2,19 @@
 
 #include <stdbool.h>
 
-#include <memory/mm.h>
+#include <memory/frame.h>
 #include <panic.h>
 
-#define KERNEL_BASE 0xC0000000 /* 3GiB */
-#define PTE_COUNT   1024
+#define PAGE_ORDER 12
+#define PTE_ORDER 10
 #define PAGE_NBYTES 4096
+#define PTE_COUNT   1024
+#define KERNEL_BASE 0xC0000000 /* 3GB */ // TODO: read from linker script
+#define KERNEL_START_PAGE_NUM (KERNEL_BASE >> PAGE_ORDER)
 
-#define __pa(va) ((va)-KERNEL_BASE)
+#define PAGE_FREE_MAP_SIZE (1 << 20)
+
+#define __pa(va) ((va) - KERNEL_BASE)
 #define __va(pa) ((pa) + KERNEL_BASE)
 
 /* Page flags */
@@ -27,18 +32,19 @@
 
 #define PAGE_PA(pte)        ((pte) & ~0xfff)
 #define PAGE_DIR_IDX(pte)   ((pte) >> 22)
-#define PAGE_TABLE_IDX(pte) (0xfff & ((pte) >> 12))
+#define PAGE_TABLE_IDX(pte) (0xff & ((pte) >> 12))
 
 /* Page flag checks */
 #define IS_PRESENT(pte) ((pte) & 0x1)
 #define IS_RW(pte)      ((pte) & 0x2)
 #define IS_ALIGNED(pte) (!((pte) & 0xfff))
 
-#define PAGE_ALLOC_SUCCESS 1
 #define PAGE_FREE_SUCCESS  1
 #define PAGE_INVALID_BASE  -1
 #define PAGE_ALREADY_FREE  -1
 #define PAGE_IN_USE        -2
+
+enum page_type { USER, KERNEL };
 
 /* page table entry */
 typedef uint32_t pte_t;
@@ -60,9 +66,8 @@ extern pa_t _page_dir;
 
 void page_init(void);
 
-/* maps a page beginning at vbase into the physical address space
-returns a negative int on fail, and a non-negative int on success. */
-int page_alloc(va_t vbase);
+void* page_alloc(enum page_type type);
+void* kpage_alloc(void);
 
 /* unmaps a page beginning at vbase */
 int page_free(va_t vbase);

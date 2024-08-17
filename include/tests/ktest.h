@@ -23,12 +23,21 @@
 
 // TODO: don't like the global state
 extern bool curr_test_passing;
+
 #define ASSERT(b)                                                              \
 	if (!(b)) {                                                            \
 		fprintk("Assert failed on line %d!\n", __LINE__);              \
 		curr_test_passing = false;                                     \
 		return;                                                        \
 	}
+
+static inline void assert_eq(int expected, int actual)
+{
+	if (expected != actual) {
+		fprintk("Expected %d, actual %d\n", expected, actual);
+		ASSERT(false);
+	}
+}
 
 /* all information to execute and track the status of a ktest */
 struct ktest_case_t {

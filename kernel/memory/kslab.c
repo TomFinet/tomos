@@ -35,14 +35,20 @@ static struct kcache_t *cache_size[KCACHE_NUM] = {
 	&cache_128, &cache_256, &cache_512, &cache_1024, &cache_2048,
 };
 
+static bool init_done = false;
+
 void kcache_init()
 {
-	kcache_grow(&cache_cache, 1);
+	if (init_done) {
+		return;
+	}
 
+	kcache_grow(&cache_cache, 1);
 	for (int i = 0; i < KCACHE_NUM; i++) {
 		kcache_grow(cache_size[i], 1);
 		kcache_add(cache_size[i]);
 	}
+	init_done = true;
 }
 
 void kcache_add(struct kcache_t *cache)
@@ -56,7 +62,7 @@ struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
 		return NULL;
 	}
 
-	struct kslab_t *slab_free = (struct kslab_t *)kheap_extend();
+	struct kslab_t *slab_free = (struct kslab_t *)kpage_alloc();
 
 	slab_free->pagenum = pagenum;
 	slab_free->capacity = KSLAB_CAPACITY(slab_free, cache->objsize);
@@ -76,8 +82,9 @@ struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
 
 	struct frame_t *frame = page_descriptor(slab_free);
 	frame->slab = slab_free;
+
 	for (int i = 1; i < pagenum; i++) {
-		frame = page_descriptor(kheap_extend());
+		frame = page_descriptor(kpage_alloc());
 		frame->slab = slab_free;
 	}
 

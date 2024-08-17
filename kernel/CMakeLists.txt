@@ -1,17 +1,16 @@
 ENABLE_LANGUAGE(C ASM)
 
-SET(CMAKE_C_FLAGS "-O2 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone -g")
+SET(CMAKE_C_FLAGS "-O0 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone -g")
 
 SET(KERNEL_SRCS
 	startup/startup.s
 
 	memory/gdt.s
 	memory/gdt.c
-	memory/mm.c
+	memory/frame.c
 	memory/paging.c
-	memory/kheap.c
   	memory/kslab.c
-  	memory/vmm.c
+  	memory/kalloc.c
 
 	interrupts/idt.s
 	interrupts/isr.s
@@ -31,11 +30,10 @@ SET(KERNEL_SRCS
 if(KTESTS)
 	SET(ENTRY_SRCS
 		tests/ktest.c
-		tests/memory/mm_tests.c
+		tests/memory/frame_tests.c
     	tests/memory/paging_tests.c
-    	tests/memory/kheap_tests.c
     	tests/memory/kslab_tests.c
-    	tests/memory/vmm_tests.c
+    	tests/memory/kalloc_tests.c
 		tests/ktest_entry.c
 	)
 else()

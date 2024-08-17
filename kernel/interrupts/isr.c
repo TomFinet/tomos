@@ -1,4 +1,5 @@
 #include <interrupts/isr.h>
+#include <panic.h>
 
 void print_interrupt_frame(struct interrupt_frame regs)
 {
@@ -18,8 +19,7 @@ void exception_handler(struct interrupt_frame regs)
 {
 	printk("exception_handler called...\n");
 	print_interrupt_frame(regs);
-	for (;;) {
-	}
+	kpanic();
 	return;
 }
 

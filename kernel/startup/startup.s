@@ -15,6 +15,10 @@
 .long FLAGS
 .long CHECKSUM
 
+.section .data
+.global _startup_kernel_mapped_pages
+.set _startup_kernel_mapped_pages, 2048
+
 .section .bss.pagetables
 .align 4096
 
@@ -57,7 +61,7 @@ _start:
 	call map_page_table
 
 	orl $3, %eax
-	movl %eax, kernel_page_dir_start + 4 
+	movl %eax, kernel_page_dir_start + 4
 
 	# set page directory in cr3
 	movl $_page_dir, %eax
