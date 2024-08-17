@@ -1,7 +1,8 @@
 while test $# != 0
 do 
   case "$1" in
-    -d | --debug) DEBUG_ON='-S';;
+    -d|--debug)
+      DEBUG_ON='-S -s';;
   esac
   shift
 done
@@ -18,6 +19,7 @@ TOMOS_QEMU_ARGS="
   -no-reboot
   -drive file=$TOMOS_IMG,cache=directsync,format=raw,id=disk
   -m 512M
-  -serial mon:stdio"
+  -serial mon:stdio
+  ${DEBUG_ON}"
 
 ${TOMOS_QEMU} ${TOMOS_QEMU_ARGS}
