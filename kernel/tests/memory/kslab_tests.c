@@ -1,5 +1,4 @@
 #include <list.h>
-#include <memory/kheap.h>
 #include <memory/kslab.h>
 #include <tests/ktest.h>
 
@@ -19,9 +18,8 @@ struct kcache_t cache_test = {
 
 void suite_init(void)
 {
-	mm_init();
+	frame_init();
 	page_init();
-	kheap_init();
 	kcache_init();
 }
 
@@ -95,7 +93,7 @@ static void test_kcache_bulk_alloc_free(void)
 	struct kslab_t *slab = kcache_grow(&cache_test, 1);
 
 	const int capacity = slab->freenum;
-	va_t *alloced = kheap_extend();
+	va_t *alloced = kpage_alloc();
 	for (int i = 0; i < capacity; i++) {
 		alloced[i] = (va_t)kcache_alloc(&cache_test);
 	}

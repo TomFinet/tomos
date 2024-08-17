@@ -1,15 +1,13 @@
-#include <memory/kheap.h>
 #include <memory/kslab.h>
-#include <memory/mm.h>
+#include <memory/frame.h>
 #include <memory/paging.h>
-#include <memory/vmm.h>
+#include <memory/kalloc.h>
 #include <tests/ktest.h>
 
 static void suite_init(void)
 {
-	mm_init();
+	frame_init();
 	page_init();
-	kheap_init();
 	kcache_init();
 }
 
@@ -26,16 +24,16 @@ static void test_kmalloc()
 	ASSERT(cache->objsize == 4);
 }
 
-static struct ktest_case_t vmm_cases[] = {
+static struct ktest_case_t kalloc_cases[] = {
 	KTEST(test_kmalloc),
 };
 
-static struct ktest_suite_t vmm_suite = {
-	.name = "vmm_suite",
+static struct ktest_suite_t kalloc_suite = {
+	.name = "kalloc_suite",
 	.init = suite_init,
 	.exit = suite_exit,
-	.cases = vmm_cases,
-	.num_cases = KTEST_NUM_CASES(vmm_cases),
+	.cases = kalloc_cases,
+	.num_cases = KTEST_NUM_CASES(kalloc_cases),
 };
 
-KTEST_SUITE(vmm_suite);
+KTEST_SUITE(kalloc_suite);

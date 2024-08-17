@@ -60,7 +60,7 @@ exception_err 11 			# segment not present
 exception_err 12			# stack-segment fault
 exception_err 13			# general protection
 exception_err 14 			# page fault
-exception_no_err 15 		# intel reserved
+exception_no_err 15 			# intel reserved
 exception_no_err 16			# x87 fpu floating-point error
 exception_err 17			# alignment check
 exception_no_err 18			# machine check

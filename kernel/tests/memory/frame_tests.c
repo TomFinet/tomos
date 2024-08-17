@@ -1,4 +1,4 @@
-#include <memory/mm.h>
+#include <memory/frame.h>
 #include <memory/paging.h>
 #include <tests/ktest.h>
 
@@ -7,7 +7,7 @@ static pa_t kernel_end;
 static void suite_init(void)
 {
 	kernel_end = (pa_t)&_kernel_physical_end;
-	mm_init();
+	frame_init();
 }
 
 static void suite_exit(void)
@@ -19,20 +19,31 @@ void print_frame(uint32_t frame)
 	fprintk("frame address: %h, kend: %h\n", frame, kernel_end);
 }
 
-void test_mm_alloc_free_frame(void)
+void test_frame_kernel_alloc(void)
+{
+	frame_init();
+	int i = 0;
+	while (i * FRAME_NBYTES < kernel_end) {
+		ASSERT(!is_frame_free(i));
+		i++;
+	}
+	ASSERT(is_frame_free(i));
+}
+
+void test_frame_alloc_free(void)
 {
 	uint32_t frame1 = alloc_frame();
 	ASSERT(frame1);
 	uint32_t aligned_addr = (kernel_end & ~0xfff);
 	aligned_addr += aligned_addr < kernel_end ? FRAME_NBYTES : 0;
-	ASSERT(frame1 == aligned_addr);
+	assert_eq(frame1, aligned_addr);
 	free_frame(frame1);
 	uint32_t frame2 = alloc_frame();
 	ASSERT(frame1 == frame2);
 	free_frame(frame2);
 }
 
-void test_mm_alloc_consecutive(void)
+void test_frame_alloc_consecutive(void)
 {
 	uint32_t frame1 = alloc_frame();
 	uint32_t frame2 = alloc_frame();
@@ -41,7 +52,7 @@ void test_mm_alloc_consecutive(void)
 	free_frame(frame2);
 }
 
-void test_mm_alloc_between(void)
+void test_frame_alloc_between(void)
 {
 	uint32_t frame1 = alloc_frame();
 	uint32_t frame2 = alloc_frame();
@@ -54,18 +65,19 @@ void test_mm_alloc_between(void)
 	free_frame(between_frame);
 }
 
-static struct ktest_case_t mm_cases[] = {
-	KTEST(test_mm_alloc_free_frame),
-	KTEST(test_mm_alloc_consecutive),
-	KTEST(test_mm_alloc_between),
+static struct ktest_case_t frame_cases[] = {
+	KTEST(test_frame_kernel_alloc),
+	KTEST(test_frame_alloc_free),
+	KTEST(test_frame_alloc_consecutive),
+	KTEST(test_frame_alloc_between),
 };
 
-static struct ktest_suite_t mm_suite = {
-	.name = "mm_suite",
+static struct ktest_suite_t frame_suite = {
+	.name = "frame_suite",
 	.init = suite_init,
 	.exit = suite_exit,
-	.cases = mm_cases,
-	.num_cases = KTEST_NUM_CASES(mm_cases),
+	.cases = frame_cases,
+	.num_cases = KTEST_NUM_CASES(frame_cases),
 };
 
-KTEST_SUITE(mm_suite);
+KTEST_SUITE(frame_suite);

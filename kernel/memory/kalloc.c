@@ -1,4 +1,4 @@
-#include <memory/vmm.h>
+#include <memory/kalloc.h>
 
 void *kmalloc(size_t nbytes)
 {

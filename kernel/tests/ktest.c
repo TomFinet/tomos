@@ -19,9 +19,6 @@ static inline void ktest_print_suite_header(struct ktest_suite_t *suite)
 
 static void ktest_print_case_result(struct ktest_case_t *tcase)
 {
-	printk("Running test case ");
-	printk(tcase->name);
-	printk(":\t");
 	if (tcase->passed) {
 		printk("passed\n");
 	} else {
@@ -52,6 +49,9 @@ void ktest_run_suite(struct ktest_suite_t *suite)
 	int pass_count = 0;
 	struct ktest_case_t *t = suite->cases;
 	for (; t < suite->cases + suite->num_cases; t++) {
+		printk("Running test case ");
+		printk(t->name);
+		printk(":\t");
 		curr_test_passing = true;
 		t->run();
 		t->passed = curr_test_passing;

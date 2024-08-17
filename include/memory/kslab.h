@@ -2,7 +2,6 @@
 
 #include <klib/kstring.h>
 #include <list.h>
-#include <memory/kheap.h>
 #include <memory/paging.h>
 
 #define KCACHE_NUM 10

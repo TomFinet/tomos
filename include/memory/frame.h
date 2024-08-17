@@ -18,9 +18,7 @@
 #define FRAME_IDX(pa) ((pa) / FRAME_NBYTES)
 #define FRAME_PA(idx) (FRAME_NBYTES * (idx))
 
-#define MEM_MAP_BLOCK_NBITS 32
 #define MEM_MAP_BLOCK_SHIFT 4
-#define MEM_MAP_BLOCK_FULL  0xffffffff
 #define MEM_MAP_BLOCK_COUNT (FRAME_COUNT >> MEM_MAP_BLOCK_SHIFT)
 
 /* Physical frame descriptor. */
@@ -40,13 +38,15 @@ start and end in physical memory. */
 extern uint32_t _kernel_physical_start;
 extern uint32_t _kernel_physical_end;
 
-void mm_init(void);
+void frame_init(void);
 
 /* returns the start physical address of the free frame. */
 uint32_t alloc_frame(void);
 
 /* we could accidentally have duplicate frames. */
 void free_frame(uint32_t pa);
+
+bool is_frame_free(int frame_pos);
 
 struct mem_map_idx_t pa_to_idx(uint32_t pa);
 
