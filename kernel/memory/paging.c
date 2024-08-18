@@ -7,7 +7,7 @@
 extern pa_t _page_dir;
 extern int _startup_kernel_mapped_pages;
 
-static va_t* page_dir;
+static pde_t* page_dir;
 static bool init_done = false;
 
 // TODO: bitmap or free list to manage 2^20 pages? 
@@ -33,16 +33,16 @@ static inline void page_zero(pte_t* page_table)
 and returns the page table address
 if the page dir entry is unmapped,
 allocate a new frame for the page table. */
-static va_t pde_table(uint16_t pde_idx)
+static pte_t* pde_read(int pde_idx)
 {
-	va_t page_table;
+	pte_t* page_table;
 	pde_t pde = page_dir[pde_idx];
 	if (IS_PRESENT(pde)) {
-		page_table = __va(PAGE_PA(pde));
+		page_table = (pte_t*)__va(PAGE_PA(pde));
 	} else {
 		pa_t table_frame = request_frame();
-		page_table = __va(table_frame);
-		page_zero((pte_t*)page_table);
+		page_table = (pte_t*)__va(table_frame);
+		page_zero(page_table);
 		page_dir[pde_idx] = PAGE_STD(table_frame);
 	}
 	return page_table;
@@ -93,7 +93,7 @@ void* page_alloc(enum page_type type)
 	int free_page_num = start_page_num + res; 
 	int pde_idx = free_page_num >> PTE_ORDER;
 	int pte_idx = free_page_num & 0x3ff;
-	va_t* page_table = (va_t*)pde_table(pde_idx);
+	pte_t* page_table = pde_read(pde_idx);
 
 	if (IS_PRESENT(page_table[pte_idx])) {
 		return NULL;
@@ -117,7 +117,7 @@ int page_free(va_t vbase)
 		return PAGE_INVALID_BASE;
 	}
 
-	uint16_t pde_idx = PAGE_DIR_IDX(vbase);
+	int pde_idx = PAGE_DIR_IDX(vbase);
 	pde_t pde = page_dir[pde_idx];
 
 	if (!IS_PRESENT(pde)) {
@@ -151,7 +151,7 @@ pa_t page_table_read(va_t vbase)
 		kpanic();
 	}
 
-	va_t *page_table = (va_t *)__va(PAGE_PA(pde));
+	pte_t* page_table = (pte_t*)__va(PAGE_PA(pde));
 	return PAGE_PA(page_table[PAGE_TABLE_IDX(vbase)]);
 }
 

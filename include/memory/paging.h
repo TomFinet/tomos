@@ -3,19 +3,16 @@
 #include <stdbool.h>
 
 #include <memory/frame.h>
+#include <memory/address.h>
 #include <panic.h>
 
 #define PAGE_ORDER 12
 #define PTE_ORDER 10
 #define PAGE_NBYTES 4096
 #define PTE_COUNT   1024
-#define KERNEL_BASE 0xC0000000 /* 3GB */ // TODO: read from linker script
 #define KERNEL_START_PAGE_NUM (KERNEL_BASE >> PAGE_ORDER)
 
 #define PAGE_FREE_MAP_SIZE (1 << 20)
-
-#define __pa(va) ((va) - KERNEL_BASE)
-#define __va(pa) ((pa) + KERNEL_BASE)
 
 /* Page flags */
 #define PAGE_PRESENT(x) (x)
@@ -51,12 +48,6 @@ typedef uint32_t pte_t;
 
 /* page directory entry */
 typedef uint32_t pde_t;
-
-/* a physical address */
-typedef uint32_t pa_t;
-
-/* a virtual address */
-typedef uint32_t va_t;
 
 /* where the kernel starts in virtual memory,
 defined in the linker script. */
