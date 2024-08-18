@@ -9,6 +9,16 @@ static bool init_done = false;
 /* Bitmap tracking free/used page frames in physical memory. */
 BITMAP(mem_map, FRAME_COUNT);
 
+static inline int frame_idx(pa_t pa)
+{
+	return pa >> FRAME_ORDER;
+}
+
+static inline pa_t frame_pa(int idx)
+{
+	return idx << FRAME_ORDER;
+}
+
 bool is_frame_free(int frame_pos)
 {
 	return bitmap_read(mem_map, frame_pos) == 0;
@@ -38,31 +48,31 @@ void frame_init(void)
 	init_done = true;
 }
 
-uint32_t alloc_frame(void)
+pa_t alloc_frame(void)
 {
 	int clear_bit_pos = bitmap_first_clear(mem_map, FRAME_COUNT);
 	if (clear_bit_pos == NOT_FOUND) {
 		return (uint32_t)NULL;
 	}
 	bitmap_set(mem_map, clear_bit_pos);
-	return FRAME_PA(clear_bit_pos);
+	return frame_pa(clear_bit_pos);
 }
 
-void free_frame(uint32_t pa)
+void free_frame(pa_t pa)
 {
-	bitmap_clear(mem_map, FRAME_IDX(pa));
+	bitmap_clear(mem_map, frame_idx(pa));
 }
 
-struct mem_map_idx_t pa_to_idx(uint32_t pa)
+struct mem_map_idx_t pa_to_idx(pa_t pa)
 {
 	struct mem_map_idx_t idx = {
-		.block = FRAME_IDX(pa) / 32,
-		.idx = FRAME_IDX(pa) % 32,
+		.block = frame_idx(pa) / 32,
+		.idx = frame_idx(pa) % 32,
 	};
 	return idx;
 }
 
-struct frame_t *pa_to_frame(uint32_t pa)
+struct frame_t* pa_to_frame(pa_t pa)
 {
-	return &frames[FRAME_IDX(pa)];
+	return &frames[frame_idx(pa)];
 }
