@@ -1,6 +1,7 @@
 #include <memory/frame.h>
 #include <klib/kbitmap.h>
 #include <klib/kstring.h>
+#include <ksymbol.h>
 
 /* Array of frame descriptors. Can be quite large. */
 static struct frame_t frames[FRAME_COUNT];
@@ -31,9 +32,8 @@ void frame_init(void)
 	}
 
 	/* 0x0 - _kernel_physical_end already allocated */
-	int kernel_frame_cnt =
-		((uint32_t)&_kernel_physical_end + FRAME_NBYTES - 1) /
-		FRAME_NBYTES;
+	pa_t kernel_end = SYMBOL_READ(_kernel_physical_end, pa_t);
+	int kernel_frame_cnt = (kernel_end + FRAME_NBYTES - 1) / FRAME_NBYTES;
 	int bitmap_blks_needed = BITMAP_BLKS(kernel_frame_cnt);
 
 	for (int b = 0; b < bitmap_blks_needed; b++) {
