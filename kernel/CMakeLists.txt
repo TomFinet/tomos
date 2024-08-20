@@ -30,6 +30,7 @@ SET(KERNEL_SRCS
 if(KTESTS)
 	SET(ENTRY_SRCS
 		tests/ktest.c
+		tests/klib/kbitmap_tests.c
 		tests/memory/frame_tests.c
     	tests/memory/paging_tests.c
     	tests/memory/kslab_tests.c
