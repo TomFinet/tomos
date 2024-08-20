@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdint.h>
+#include <stdbool.h>
+
 #define NOT_FOUND -1
 #define ALL_SET 0xffffffff
 
