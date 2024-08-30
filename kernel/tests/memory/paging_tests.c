@@ -1,3 +1,4 @@
+#include <interrupts/isr.h>
 #include <memory/frame.h>
 #include <memory/paging.h>
 #include <tests/ktest.h>
@@ -16,7 +17,7 @@ static void suite_exit(void)
  * Startup.s sets up the page directory and 3 page tables.
  * One is an identity mapped page table, i.e. virtual address is physical address.
  * The other two correspond to the upper quarter kernel, 2048 pages are mapped
- * starting from 0xc0000000, thus ending at  
+ * starting from 0xc0000000, thus ending at 0xc0400000
  * At startup, we only want to allocate enough for the kernel text and data.
  * The rest can be done on demand.
  */
@@ -51,10 +52,34 @@ void test_paging_bulk_alloc_and_free(void)
 	}
 }
 
+static bool entered_isr = false;
+static int* null_ptr = NULL;
+static void* resume_at = NULL;
+static void test_paging_nullptr_page_fault_handler(struct isr_frame* frame);
+
+__attribute__((optimize("O0"))) void test_paging_nullptr_page_fault(void)
+{
+	isr_register(14, test_paging_nullptr_page_fault_handler);
+	entered_isr = false;
+	resume_at = &&resume;
+
+	*null_ptr = 42;
+	goto resume;
+resume:
+	ASSERT(entered_isr);
+}
+
+static void test_paging_nullptr_page_fault_handler(struct isr_frame* frame)
+{
+	entered_isr = true;
+	frame->eip = (uint32_t)resume_at;
+}
+
 static struct ktest_case_t paging_cases[] = {
 	KTEST(test_paging_alloc_and_free),
 	KTEST(test_paging_double_free),
-	KTEST(test_paging_bulk_alloc_and_free)
+	KTEST(test_paging_bulk_alloc_and_free),
+	KTEST(test_paging_nullptr_page_fault)
 };
 
 static struct ktest_suite_t paging_suite = {

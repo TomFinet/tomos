@@ -90,8 +90,12 @@ next:
 .section .text
 
 kernel_higher:
+	# unmap the identity page
+	# enable NULL ptr exceptions to cause page faults
 	movl $0, _page_dir
 	invlpg 0
+	# TODO: the identity page table is now usable space,
+	# we should reclaim it for something.
 
 	movl $stack_top, %esp
 	
