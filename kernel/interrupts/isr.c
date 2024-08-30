@@ -1,31 +1,46 @@
 #include <interrupts/isr.h>
+#include <interrupts/idt.h>
 #include <panic.h>
 
-void print_interrupt_frame(struct interrupt_frame regs)
-{
-	fprintk("\
-		isr_num: %d, err_code: %h\n\
-		ds: %h\n\
-		eax: %h, ecx: %h, edx: %h\n\
-		ebx: %h, old_esp: %h, ebp: %h\n\
-		esi: %h, edi: %h\n\
-		eip: %h, cs: %h, eflags: %b\n\n",
-		regs.isr_num, regs.err_code, regs.ds, regs.eax, regs.ecx,
-		regs.edx, regs.ebx, regs.esp_old, regs.ebp, regs.esi, regs.edi,
-		regs.eip, regs.cs, regs.eflags);
-}
+static isr_t _isr[IDT_GATE_NUM];
 
-void exception_handler(struct interrupt_frame regs)
+// TODO: isr should not know internals of PF handler
+// move to different file in memory dir
+static void page_fault_handler(struct isr_frame* frame)
 {
-	printk("exception_handler called...\n");
-	print_interrupt_frame(regs);
+	isr_print_frame(frame);
 	kpanic();
-	return;
 }
 
-void irq_handler(struct interrupt_frame regs)
+void isr_print_frame(struct isr_frame* frame)
 {
-	printk("irq_handler called...\n");
-	print_interrupt_frame(regs);
-	return;
+	fprintk("\nisr_num: %d, error code: %d\n"
+		"old ds: %h, old cs: %h\n"
+		"eax: %h, ecx: %h, edx: %h\n"
+		"ebx: %h, old_esp: %h, ebp: %h\n"
+		"esi: %h, edi: %h\n"
+		"eip: %h\n"
+		"eflags: %b\n\n",
+		frame->isr_num, frame->err_code,
+		frame->ds, frame->cs,
+		frame->eax, frame->ecx, frame->edx,
+		frame->ebx, frame->esp_old, frame->ebp,
+		frame->esi, frame->edi,
+		frame->eip,
+		frame->eflags);
+}
+
+void isr_master(struct isr_frame frame)
+{
+	_isr[frame.isr_num](&frame);
+}
+
+void isr_register(int isr_num, isr_t isr)
+{
+	_isr[isr_num] = isr;
+}
+
+void isr_init(void)
+{
+	isr_register(14, page_fault_handler);
 }
