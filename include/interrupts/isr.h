@@ -3,13 +3,15 @@
 #include <klib/kstdio.h>
 #include <stdint.h>
 
-/// view of the stack frame setup by an interrupt
-struct interrupt_frame {
+struct isr_frame {
 	uint32_t ds;
 	uint32_t edi, esi, ebp, esp_old, ebx, edx, ecx, eax;
-	uint32_t isr_num;
-	uint32_t err_code, eip, cs, eflags, esp_user, ss;
+	uint32_t isr_num, err_code;
+	uint32_t eip, cs, eflags;
 };
 
-void exception_handler(struct interrupt_frame regs);
-void irq_handler(struct interrupt_frame regs);
+typedef void (*isr_t)(struct isr_frame*);
+
+void isr_init(void);
+void isr_register(int isr_num, isr_t isr);
+void isr_print_frame(struct isr_frame* frame);
