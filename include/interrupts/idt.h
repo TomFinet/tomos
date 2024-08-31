@@ -14,10 +14,12 @@
 #pragma once
 
 #include <interrupts/pic.h>
+#include <interrupts/isr_def.h>
+
 #include <klib/kstdio.h>
 #include <klib/kstring.h>
 
-#define IDT_GATE_NUM 256
+#define IDT_GATE_NUM ISR_NUM
 #define IDT_IRQ0     32
 
 #define GATE_PRES(x) ((x) << 7)
@@ -46,6 +48,5 @@ void idt_init();
 
 extern void idt_set(uint32_t idt_addr);
 
-/// these have a meaning defined in the intel manuals.
 extern void isr_13(void);
 extern void isr_14(void);

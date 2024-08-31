@@ -1,3 +1,5 @@
+#include <interrupts/isr_def.h>
+
 .extern isr_master
 
 isr_common:
@@ -24,16 +26,14 @@ isr_common:
 	add $0x8, %esp	# clear isr_num and error code
 	iret
 
-# error code is pushed on by processor
-.macro isr, isr_num
+.macro isr_err, isr_num
 .global isr_\isr_num
 isr_\isr_num:
 	pushl $\isr_num
 	jmp isr_common
 .endm
 
-# dummy error code is pushed on by us
-.macro isr_err, isr_num
+.macro isr_no_err, isr_num
 .global isr_\isr_num
 isr_\isr_num:
 	pushl $0x0
@@ -41,5 +41,5 @@ isr_\isr_num:
 	jmp isr_common
 .endm
 
-isr 13
-isr 14
+isr_err ISR_GP
+isr_err ISR_PF
