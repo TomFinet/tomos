@@ -1,8 +1,8 @@
+#include <interrupts/isr_def.h>
 #include <interrupts/isr.h>
-#include <interrupts/idt.h>
 #include <panic.h>
 
-static isr_t _isr[IDT_GATE_NUM];
+static isr_t _isr[ISR_NUM];
 
 // TODO: isr should not know internals of PF handler
 // move to different file in memory dir
@@ -42,5 +42,5 @@ void isr_register(int isr_num, isr_t isr)
 
 void isr_init(void)
 {
-	isr_register(14, page_fault_handler);
+	isr_register(ISR_PF, page_fault_handler);
 }
