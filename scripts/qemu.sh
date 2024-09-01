@@ -2,7 +2,7 @@ while test $# != 0
 do 
   case "$1" in
     -d|--debug)
-      DEBUG_ON='-S -s';;
+      #DEBUG_ON='-S -s';;
   esac
   shift
 done

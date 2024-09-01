@@ -6,8 +6,6 @@
 
 #define KCACHE_NUM 10
 
-#define KSLAB_FULL 0xffff
-
 #define KSLAB_SIZE(slabp) (slabp->pagenum * PAGE_NBYTES)
 
 #define KSLAB_CAPACITY(slabp, objsize)                                         \

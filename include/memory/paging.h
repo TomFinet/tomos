@@ -6,13 +6,10 @@
 #include <memory/address.h>
 #include <panic.h>
 
-#define PAGE_ORDER 12
-#define PTE_ORDER 10
-#define PAGE_NBYTES 4096
-#define PTE_COUNT   1024
-#define KERNEL_START_PAGE_NUM (KERNEL_BASE >> PAGE_ORDER)
-
-#define PAGE_FREE_MAP_SIZE (1 << 20)
+#define PAGE_NBYTES ORDER_SHL(PAGE_ORDER)
+#define PTE_COUNT ORDER_SHL(PTE_ORDER)
+#define PDE_COUNT ORDER_SHL(PDE_ORDER)
+#define PAGE_COUNT ORDER_SHL(PDE_ORDER + PTE_ORDER)
 
 /* Page flags */
 #define PAGE_PRESENT(x) (x)
@@ -49,14 +46,6 @@ typedef uint32_t pte_t;
 /* page directory entry */
 typedef uint32_t pde_t;
 
-/* where the kernel starts in virtual memory,
-defined in the linker script. */
-extern va_t _higher_start;
-
-extern pa_t _page_dir;
-
-void page_init(void);
-
 void* page_alloc(enum page_type type);
 void* kpage_alloc(void);
 
@@ -67,4 +56,6 @@ int page_free(va_t vbase);
 pte_t page_table_read(va_t vbase);
 
 /* Returns the page descriptor for a given va. */
-struct frame_t *page_descriptor(void *va);
+struct frame_t* page_descriptor(void *va);
+
+void page_init(void);

@@ -24,14 +24,14 @@ static void suite_exit(void)
 void test_paging_alloc_and_free(void)
 {
 	va_t page = (va_t)kpage_alloc();
-	ASSERT(page >= KERNEL_BASE);
+	ASSERT(page >= KERNEL_VA_BASE);
 	ASSERT(page_free(page) == PAGE_FREE_SUCCESS);
 }
 
 void test_paging_double_free(void)
 {	
 	va_t page = (va_t)kpage_alloc();
-	ASSERT(page >= KERNEL_BASE);
+	ASSERT(page >= KERNEL_VA_BASE);
 	ASSERT(page_free(page) == PAGE_FREE_SUCCESS);
 	ASSERT(page_free(page) == PAGE_ALREADY_FREE);
 }
@@ -41,7 +41,7 @@ void test_paging_bulk_alloc_and_free(void)
 	#define n 10
 	va_t pages[n];
 	pages[0] = (va_t)kpage_alloc();
-	ASSERT(pages[0] >= KERNEL_BASE);
+	ASSERT(pages[0] >= KERNEL_VA_BASE);
 	for (int i = 1; i < n; i++) {
 		pages[i] = (va_t)kpage_alloc();	
 		ASSERT(pages[i] == pages[i - 1] + PAGE_NBYTES);
