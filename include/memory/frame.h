@@ -2,7 +2,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #include <klib/kstdio.h>
 #include <memory/address.h>
