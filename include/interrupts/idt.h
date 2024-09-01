@@ -20,7 +20,6 @@
 #include <klib/kstring.h>
 
 #define IDT_GATE_NUM ISR_NUM
-#define IDT_IRQ0     32
 
 #define GATE_PRES(x) ((x) << 7)
 #define GATE_DPL(x)  ((x) << 5)

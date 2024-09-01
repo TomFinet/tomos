@@ -3,7 +3,7 @@ ENABLE_LANGUAGE(C ASM)
 SET(CMAKE_C_FLAGS "-O0 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-red-zone -g")
 
 SET(KERNEL_SRCS
-	startup/startup.s
+	startup/startup.S
 
 	memory/gdt.s
 	memory/gdt.c
@@ -13,7 +13,7 @@ SET(KERNEL_SRCS
   	memory/kalloc.c
 
 	interrupts/idt.s
-	interrupts/isr.s
+	interrupts/isr.S
 	interrupts/idt.c
 	interrupts/isr.c
 
@@ -45,8 +45,9 @@ endif()
 
 ADD_EXECUTABLE(tomos ${KERNEL_SRCS} ${ENTRY_SRCS})
 
-ADD_CUSTOM_TARGET(preprocess_linker_script
-    COMMAND "${CMAKE_C_COMPILER}" -E -P -x c ${CMAKE_SOURCE_DIR}/scripts/i386-pc.ld.in -o ${CMAKE_SOURCE_DIR}/build/i386-pc.ld -DKTESTS
+ADD_CUSTOM_TARGET(linker_script
+	COMMAND "${CMAKE_C_COMPILER}" -E -P -I"${CMAKE_SOURCE_DIR}"/include/
+	-x c ${CMAKE_SOURCE_DIR}/scripts/i386-pc.ld.in -o ${CMAKE_SOURCE_DIR}/build/i386-pc.ld -DKTESTS
 )
 
 SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/build/i386-pc.ld)

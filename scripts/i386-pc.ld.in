@@ -1,8 +1,11 @@
 /**
  * Higher-quarter kernel.
- * Virtual address base is 0xc0100000
- * load address is 1MiB = 0x00100000 because grub exists below there.
+ * Virtual address base is 0xc0200000
+ * Physical load address is 2MiB = 0x00200000
+ * because grub exists below there.
  */
+
+#include <memory/memory_def.h>
 
 #define LINK_KTEST() \
 	. = ALIGN(4); \
@@ -12,13 +15,11 @@
 	
 ENTRY(_start)
 
-_higher_start = 0xc0000000;
-
 SECTIONS
 {
-	. = 2M;
+	. = KERNEL_PA_BASE;
 	_kernel_physical_start = .;
-	_kernel_virtual_start = . + _higher_start;
+	_kernel_virtual_start = . + KERNEL_VA_BASE;
 
 	.early : ALIGN(4K) {
 		*(.multiboot)
@@ -29,31 +30,31 @@ SECTIONS
 		*(.bss.pagatables)
 	}
 
-	. += _higher_start;
+	. += KERNEL_VA_BASE;
 	
-	.text ALIGN(4K) : AT(ADDR(.text) - _higher_start) {
+	.text ALIGN(4K) : AT(ADDR(.text) - KERNEL_VA_BASE) {
 		_kernel_text_start = .;
 		*(.text)
 		_kernel_text_end = .;
 	}
 	
-	.rodata ALIGN(4K) : AT(ADDR(.rodata) - _higher_start) { 
+	.rodata ALIGN(4K) : AT(ADDR(.rodata) - KERNEL_VA_BASE) {
 		*(.rodata)
 	}
  
-	.data ALIGN(4K) : AT(ADDR(.data) - _higher_start) {
+	.data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VA_BASE) {
 		*(.data)
 		#ifdef KTESTS
 			LINK_KTEST()
 		#endif
 	}
  
-	.bss ALIGN(4K) : AT(ADDR(.bss) - _higher_start) {
+	.bss ALIGN(4K) : AT(ADDR(.bss) - KERNEL_VA_BASE) {
 		*(COMMON)
 		*(.bss)
 		. = ALIGN(0x1000);
 	}
 
-	_kernel_physical_end = . - _higher_start;
+	_kernel_physical_end = . - KERNEL_VA_BASE;
 	_kernel_virtual_end = .;
 }

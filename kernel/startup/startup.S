@@ -1,19 +1,13 @@
-.set ALIGN,    0x1
-.set MEMINFO,  0x2
-.set FLAGS,    ALIGN | MEMINFO
-.set MAGIC,    0x1BADB002
-.set CHECKSUM, -(MAGIC + FLAGS) 
-
-.set kernel_virtual_start, 0xc0000000
-.set kernel_page_dir, kernel_virtual_start >> 22
+#include <memory/memory_def.h>
+#include <grub_def.h>
 
 .extern kentry
 
 .section .multiboot
 .align 4
-.long MAGIC
-.long FLAGS
-.long CHECKSUM
+.long GRUB_MAGIC
+.long GRUB_FLAGS
+.long GRUB_CHECKSUM
 
 .section .data
 .global _startup_kernel_mapped_pages
@@ -24,9 +18,9 @@
 
 .global _page_dir
 _page_dir:
-	.fill kernel_page_dir, 4, 0
+	.fill KERNEL_PDE_BASE, 4, 0
 kernel_page_dir_start:
-	.fill (1024 - kernel_page_dir), 4, 0
+	.fill (1024 - KERNEL_PDE_BASE), 4, 0
 
 kernel_page_table_0:
 	.fill 1024, 4, 0

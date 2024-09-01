@@ -10,7 +10,7 @@ rm "$SRC_ROOT/build/CMakeFiles" "$SRC_ROOT/build/kernel" "$SRC_ROOT/build/root" 
 mkdir -p "$SRC_ROOT/build" && cd "$SRC_ROOT/build"
 cmake .. -DCMAKE_TOOLCHAIN_FILE=$SRC_ROOT/toolchain/CMakeToolchain.txt
 
-make preprocess_linker_script
+make linker_script
 make install
 
 # make returns 2 if errors

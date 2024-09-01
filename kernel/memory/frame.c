@@ -1,23 +1,35 @@
 #include <memory/frame.h>
+
 #include <klib/kbitmap.h>
 #include <klib/kstring.h>
+
 #include <ksymbol.h>
+#include <panic.h>
+
+/* where the static parts of the kernel
+start and end in physical memory. */
+extern pa_t _kernel_physical_start;
+extern pa_t _kernel_physical_end;
 
 /* Array of frame descriptors. Can be quite large. */
 static struct frame_t frames[FRAME_COUNT];
-static bool init_done = false;
 
-/* Bitmap tracking free/used page frames in physical memory. */
+/* Tracks free/used page frames in physical memory. */
 BITMAP(mem_map, FRAME_COUNT);
 
-static inline int frame_idx(pa_t pa)
+static inline int frame_pa_to_idx(pa_t frame)
 {
-	return pa >> FRAME_ORDER;
+	return frame >> FRAME_ORDER;
 }
 
-static inline pa_t frame_pa(int idx)
+static inline pa_t frame_idx_to_pa(int idx)
 {
 	return idx << FRAME_ORDER;
+}
+
+static inline bool frame_is_aligned(pa_t frame)
+{
+	return !(frame & (ORDER_SHL(FRAME_ORDER) - 1));
 }
 
 bool is_frame_free(int frame_pos)
@@ -25,6 +37,7 @@ bool is_frame_free(int frame_pos)
 	return bitmap_read(mem_map, frame_pos) == 0;
 }
 
+static bool init_done = false;
 void frame_init(void)
 {
 	if (init_done) {
@@ -50,29 +63,26 @@ void frame_init(void)
 
 pa_t alloc_frame(void)
 {
-	int clear_bit_pos = bitmap_first_clear(mem_map, FRAME_COUNT);
-	if (clear_bit_pos == NOT_FOUND) {
-		return (uint32_t)NULL;
+	int free_frame_idx = bitmap_first_clear(mem_map, FRAME_COUNT);
+	if (free_frame_idx == NOT_FOUND) {
+		kpanic();
 	}
-	bitmap_set(mem_map, clear_bit_pos);
-	return frame_pa(clear_bit_pos);
+	bitmap_set(mem_map, free_frame_idx);
+	return frame_idx_to_pa(free_frame_idx);
 }
 
-void free_frame(pa_t pa)
+void free_frame(pa_t frame)
 {
-	bitmap_clear(mem_map, frame_idx(pa));
+	if (!frame_is_aligned(frame)) {
+		kpanic();
+	}
+	bitmap_clear(mem_map, frame_pa_to_idx(frame));
 }
 
-struct mem_map_idx_t pa_to_idx(pa_t pa)
+struct frame_t* pa_to_frame(pa_t frame)
 {
-	struct mem_map_idx_t idx = {
-		.block = frame_idx(pa) / 32,
-		.idx = frame_idx(pa) % 32,
-	};
-	return idx;
-}
-
-struct frame_t* pa_to_frame(pa_t pa)
-{
-	return &frames[frame_idx(pa)];
+	if (!frame_is_aligned(frame)) {
+		return NULL;
+	}
+	return &frames[frame_pa_to_idx(frame)];
 }

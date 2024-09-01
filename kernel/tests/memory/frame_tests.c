@@ -1,22 +1,20 @@
 #include <memory/frame.h>
 #include <memory/paging.h>
 #include <tests/ktest.h>
+#include <ksymbol.h>
 
+extern pa_t _kernel_physical_start;
+extern pa_t _kernel_physical_end;
 static pa_t kernel_end;
 
 static void suite_init(void)
 {
-	kernel_end = (pa_t)&_kernel_physical_end;
+	kernel_end = SYMBOL_READ(_kernel_physical_end, pa_t);
 	frame_init();
 }
 
 static void suite_exit(void)
 {
-}
-
-void print_frame(uint32_t frame)
-{
-	fprintk("frame address: %h, kend: %h\n", frame, kernel_end);
 }
 
 void test_frame_kernel_alloc(void)
