@@ -7,7 +7,7 @@ Currently, it supports:
 - [x] interrupt handling.
 - [x] page-frame allocator.
 - [x] slab allocator.
-- [] *kernel threads coming soon...* 
+- [ ] *kernel threads coming soon...* 
 
 ## How to run it.
 
