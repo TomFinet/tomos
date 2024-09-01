@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #define KERNEL_BASE 0xC0000000 /* 3GB */ // TODO: read from linker script
 
 /* a physical address */

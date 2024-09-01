@@ -1,6 +1,8 @@
 #pragma once
 
+#include <memory/address.h>
 #include <klib/kstdio.h>
+
 #include <stdint.h>
 
 #define GDT_ENTRY_NUM 5
@@ -9,15 +11,13 @@
 
 // Each define here is for a specific flag in the descriptor.
 // Refer to the intel documentation for a description of what each one does.
-#define SEG_DESCTYPE(x)                                                        \
-	((x) << 0x04) // Descriptor type (0 for system, 1 for code/data)
-#define SEG_PRES(x) ((x) << 0x07) // Present
-#define SEG_SAVL(x) ((x) << 0x0C) // Available for system use
-#define SEG_LONG(x) ((x) << 0x0D) // Long mode
-#define SEG_SIZE(x) ((x) << 0x0E) // Size (0 for 16-bit, 1 for 32)
-#define SEG_GRAN(x)                                                            \
-	((x) << 0x0F) // Granularity (0 for 1B - 1MB, 1 for 4KB - 4GB)
-#define SEG_PRIV(x) (((x) & 0x03) << 0x05) // Set privilege level (0 - 3)
+#define SEG_DESCTYPE(x) ((x) << 0x04)		// Descriptor type (0 for system, 1 for code/data)
+#define SEG_PRES(x) ((x) << 0x07)		// Present
+#define SEG_SAVL(x) ((x) << 0x0C) 		// Available for system use
+#define SEG_LONG(x) ((x) << 0x0D) 		// Long mode
+#define SEG_SIZE(x) ((x) << 0x0E) 		// Size (0 for 16-bit, 1 for 32)
+#define SEG_GRAN(x) ((x) << 0x0F) 		// Granularity (0 for 1B - 1MB, 1 for 4KB - 4GB)
+#define SEG_PRIV(x) (((x) & 0x03) << 0x05)	// Set privilege level (0 - 3)
 
 #define SEG_DATA_RD        0x00 // Read-Only
 #define SEG_DATA_RDA       0x01 // Read-Only, accessed
@@ -60,13 +60,11 @@ struct gdt_entry {
 	uint8_t base_high;
 } __attribute__((packed));
 
-///
 struct gdt_ptr {
 	uint16_t limit;
 	uint32_t base;
 } __attribute__((packed));
 
-///
 void gdt_init();
 
-extern void gdt_set(uint32_t gdt_addr);
+extern void gdt_set(struct gdt_ptr* gdt_addr);
