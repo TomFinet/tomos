@@ -6,20 +6,13 @@
  */
 
 #include <memory/memory_def.h>
-
-#define LINK_KTEST() \
-	. = ALIGN(4); \
-	_ktest_start = .; \
-	KEEP(*(.ktest)) \
-	_ktest_end = .;
+#include <linker_sections.h>
 	
 ENTRY(_start)
 
 SECTIONS
 {
 	. = KERNEL_PA_BASE;
-	_kernel_physical_start = .;
-	_kernel_virtual_start = . + KERNEL_VA_BASE;
 
 	.early : ALIGN(4K) {
 		*(.multiboot)
@@ -44,9 +37,7 @@ SECTIONS
  
 	.data ALIGN(4K) : AT(ADDR(.data) - KERNEL_VA_BASE) {
 		*(.data)
-		#ifdef KTESTS
-			LINK_KTEST()
-		#endif
+		SECT_KTESTS
 	}
  
 	.bss ALIGN(4K) : AT(ADDR(.bss) - KERNEL_VA_BASE) {
@@ -55,6 +46,6 @@ SECTIONS
 		. = ALIGN(0x1000);
 	}
 
-	_kernel_physical_end = . - KERNEL_VA_BASE;
-	_kernel_virtual_end = .;
+	_kernel_pa_end = . - KERNEL_VA_BASE;
+	_kernel_va_end = .;
 }

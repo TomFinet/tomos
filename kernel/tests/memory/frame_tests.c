@@ -3,13 +3,11 @@
 #include <tests/ktest.h>
 #include <ksymbol.h>
 
-extern pa_t _kernel_physical_start;
-extern pa_t _kernel_physical_end;
-static pa_t kernel_end;
+SYMBOL_DEFINE(kernel_pa_end, pa_t);
 
 static void suite_init(void)
 {
-	kernel_end = SYMBOL_READ(_kernel_physical_end, pa_t);
+	kernel_pa_end = SYMBOL_READ(_kernel_pa_end, pa_t);
 	frame_init();
 }
 
@@ -21,7 +19,7 @@ void test_frame_kernel_alloc(void)
 {
 	frame_init();
 	int i = 0;
-	while (i * FRAME_NBYTES < kernel_end) {
+	while (i * FRAME_NBYTES < kernel_pa_end) {
 		ASSERT(!is_frame_free(i));
 		i++;
 	}
@@ -32,8 +30,8 @@ void test_frame_alloc_free(void)
 {
 	uint32_t frame1 = alloc_frame();
 	ASSERT(frame1);
-	uint32_t aligned_addr = (kernel_end & ~0xfff);
-	aligned_addr += aligned_addr < kernel_end ? FRAME_NBYTES : 0;
+	uint32_t aligned_addr = (kernel_pa_end & ~0xfff);
+	aligned_addr += aligned_addr < kernel_pa_end ? FRAME_NBYTES : 0;
 	assert_eq(frame1, aligned_addr);
 	free_frame(frame1);
 	uint32_t frame2 = alloc_frame();
