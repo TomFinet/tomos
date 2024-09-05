@@ -31,7 +31,6 @@
 /* Page flag checks */
 #define IS_PRESENT(pte) ((pte) & 0x1)
 #define IS_RW(pte)      ((pte) & 0x2)
-#define IS_ALIGNED(pte) (!((pte) & 0xfff))
 
 #define PAGE_FREE_SUCCESS  1
 #define PAGE_INVALID_BASE  -1

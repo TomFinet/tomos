@@ -101,10 +101,6 @@ void* kpage_alloc()
 
 int page_free(va_t vbase)
 {
-	if (!IS_ALIGNED(vbase)) {
-		return PAGE_INVALID_BASE;
-	}
-
 	int pde_idx = PAGE_DIR_IDX(vbase);
 	pde_t pde = page_dir[pde_idx];
 
@@ -130,10 +126,6 @@ int page_free(va_t vbase)
 
 pa_t page_table_read(va_t vbase)
 {
-	if (!IS_ALIGNED(vbase)) {
-		return PAGE_INVALID_BASE;
-	}
-
 	pde_t pde = page_dir[PAGE_DIR_IDX(vbase)];
 	if (!IS_PRESENT(pde)) {
 		kpanic();

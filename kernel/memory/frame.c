@@ -16,26 +16,6 @@ static struct frame_t frames[FRAME_COUNT];
 /* Tracks free/used page frames in physical memory. */
 BITMAP(mem_map, FRAME_COUNT);
 
-static inline int frame_pa_to_idx(pa_t frame)
-{
-	return frame >> FRAME_ORDER;
-}
-
-static inline pa_t frame_idx_to_pa(int idx)
-{
-	return idx << FRAME_ORDER;
-}
-
-static inline bool frame_is_aligned(pa_t frame)
-{
-	return !(frame & (ORDER_SHL(FRAME_ORDER) - 1));
-}
-
-bool is_frame_free(int frame_pos)
-{
-	return bitmap_read(mem_map, frame_pos) == 0;
-}
-
 static bool init_done = false;
 void frame_init(void)
 {
@@ -67,21 +47,20 @@ pa_t alloc_frame(void)
 		kpanic();
 	}
 	bitmap_set(mem_map, free_frame_idx);
-	return frame_idx_to_pa(free_frame_idx);
+	return free_frame_idx << FRAME_ORDER;
 }
 
 void free_frame(pa_t frame)
 {
-	if (!frame_is_aligned(frame)) {
-		kpanic();
-	}
-	bitmap_clear(mem_map, frame_pa_to_idx(frame));
+	bitmap_clear(mem_map, frame >> FRAME_ORDER);
 }
 
 struct frame_t* pa_to_frame(pa_t frame)
 {
-	if (!frame_is_aligned(frame)) {
-		return NULL;
-	}
-	return &frames[frame_pa_to_idx(frame)];
+	return &frames[frame >> FRAME_ORDER];
+}
+
+bool is_frame_free(int frame_pos)
+{
+	return bitmap_read(mem_map, frame_pos) == 0;
 }
