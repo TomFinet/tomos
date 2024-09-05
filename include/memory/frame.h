@@ -27,7 +27,5 @@ void frame_init(void);
 /* returns the start physical address of the free frame. */
 pa_t alloc_frame(void);
 void free_frame(pa_t frame);
-
-bool is_frame_free(int idx);
-
 struct frame_t* pa_to_frame(pa_t frame);
+bool is_frame_free(int idx);
