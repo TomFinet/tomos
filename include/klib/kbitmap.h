@@ -8,6 +8,9 @@
 
 #define BITS_IN_BLK 32
 
+#define BIT(n) (1 << (n))
+#define BITMASK(n) (BIT(n) - 1)
+
 #define BITMAP_BLKS(n) ((n + BITS_IN_BLK - 1) / BITS_IN_BLK)
 #define BITMAP(bitmap, n) uint32_t bitmap[BITMAP_BLKS(n)]
 
