@@ -4,6 +4,7 @@
 #include <memory/address.h>
 #include <memory/memory_def.h>
 
+#include <klib/kbitmap.h>
 #include <klib/kstdio.h>
 #include <list.h>
 
@@ -12,9 +13,8 @@
 /* Kernel's physical memory manager.
  * Implements single page frame allocation. */
 
-#define FRAME_ORDER   12
-#define FRAME_NBYTES  ORDER_SHL(FRAME_ORDER)
-#define FRAME_COUNT   (SYSTEM_MEM >> FRAME_ORDER)
+#define FRAME_NBYTES BIT(FRAME_ORDER)
+#define FRAME_COUNT (SYSTEM_MEM >> FRAME_ORDER)
 
 /* Physical frame descriptor. */
 struct frame_t {
@@ -23,9 +23,7 @@ struct frame_t {
 };
 
 void frame_init(void);
-
-/* returns the start physical address of the free frame. */
-pa_t alloc_frame(void);
-void free_frame(pa_t frame);
-struct frame_t* pa_to_frame(pa_t frame);
-bool is_frame_free(int idx);
+pa_t frame_alloc(void);
+void frame_free(pa_t frame);
+struct frame_t* frame_from_pa(pa_t frame);
+bool frame_is_free(int idx);

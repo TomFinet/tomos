@@ -93,7 +93,7 @@ static void test_kcache_bulk_alloc_free(void)
 	struct kslab_t *slab = kcache_grow(&cache_test, 1);
 
 	const int capacity = slab->freenum;
-	va_t *alloced = kpage_alloc();
+	va_t *alloced = page_alloc();
 	for (int i = 0; i < capacity; i++) {
 		alloced[i] = (va_t)kcache_alloc(&cache_test);
 	}

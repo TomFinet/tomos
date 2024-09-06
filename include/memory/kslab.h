@@ -1,8 +1,8 @@
 #pragma once
 
+#include <memory/paging.h>
 #include <klib/kstring.h>
 #include <list.h>
-#include <memory/paging.h>
 
 #define KCACHE_NUM 10
 
