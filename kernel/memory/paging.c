@@ -54,9 +54,10 @@ void* page_alloc(void)
 		return NULL;
 	}
 	
-	int free_page_num = start_page_num + res; 
-	int pde_idx = free_page_num >> PTE_ORDER;
-	int pte_idx = free_page_num & BITMASK(PTE_ORDER);
+	int free_page_num = start_page_num + res;
+	va_t free_page_va = free_page_num << PAGE_ORDER;
+	int pde_idx = PDE_IDX(free_page_va);
+	int pte_idx = PTE_IDX(free_page_va);
 
 	if (!IS_PRESENT(page_dir[pde_idx])) {
 		pa_t frame = frame_alloc();
@@ -72,15 +73,16 @@ void* page_alloc(void)
 
 	pa_t frame = frame_alloc();
 	page_table[pte_idx] = PAGE_STD(frame);
-	page_tlb_invalid(free_page_num << PAGE_ORDER);
+	page_tlb_invalid(free_page_va);
 	bitmap_set(page_free_map, free_page_num);
 
-	return (void*)(free_page_num << PAGE_ORDER);
+	return (void*)free_page_va;
 }
 
 int page_free(va_t vbase)
 {
-	int pde_idx = PAGE_DIR_IDX(vbase);
+	int pde_idx = PDE_IDX(vbase);
+	int pte_idx = PTE_IDX(vbase);
 	pde_t pde = page_dir[pde_idx];
 
 	if (!IS_PRESENT(pde)) {
@@ -88,7 +90,6 @@ int page_free(va_t vbase)
 	}
 
 	pte_t* page_table = (pte_t*)__va(PAGE_PA(pde));
-	int pte_idx = PAGE_TABLE_IDX(vbase);
 	pte_t pte = page_table[pte_idx];
 
 	if (!IS_PRESENT(pte)) {
