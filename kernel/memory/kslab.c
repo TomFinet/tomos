@@ -62,7 +62,7 @@ struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
 		return NULL;
 	}
 
-	struct kslab_t *slab_free = (struct kslab_t *)kpage_alloc();
+	struct kslab_t *slab_free = (struct kslab_t *)page_alloc();
 
 	slab_free->pagenum = pagenum;
 	slab_free->capacity = KSLAB_CAPACITY(slab_free, cache->objsize);
@@ -84,7 +84,7 @@ struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
 	frame->slab = slab_free;
 
 	for (int i = 1; i < pagenum; i++) {
-		frame = page_descriptor(kpage_alloc());
+		frame = page_descriptor(page_alloc());
 		frame->slab = slab_free;
 	}
 

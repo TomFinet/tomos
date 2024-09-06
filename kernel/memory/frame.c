@@ -1,6 +1,5 @@
 #include <memory/frame.h>
 
-#include <klib/kbitmap.h>
 #include <klib/kstring.h>
 
 #include <ksymbol.h>
@@ -40,27 +39,27 @@ void frame_init(void)
 	init_done = true;
 }
 
-pa_t alloc_frame(void)
+pa_t frame_alloc(void)
 {
-	int free_frame_idx = bitmap_first_clear(mem_map, FRAME_COUNT);
-	if (free_frame_idx == NOT_FOUND) {
+	int frame_free_idx = bitmap_first_clear(mem_map, FRAME_COUNT);
+	if (frame_free_idx == NOT_FOUND) {
 		kpanic();
 	}
-	bitmap_set(mem_map, free_frame_idx);
-	return free_frame_idx << FRAME_ORDER;
+	bitmap_set(mem_map, frame_free_idx);
+	return frame_free_idx << FRAME_ORDER;
 }
 
-void free_frame(pa_t frame)
+void frame_free(pa_t frame)
 {
 	bitmap_clear(mem_map, frame >> FRAME_ORDER);
 }
 
-struct frame_t* pa_to_frame(pa_t frame)
+struct frame_t* frame_from_pa(pa_t frame)
 {
 	return &frames[frame >> FRAME_ORDER];
 }
 
-bool is_frame_free(int frame_pos)
+bool frame_is_free(int frame_pos)
 {
 	return bitmap_read(mem_map, frame_pos) == 0;
 }
