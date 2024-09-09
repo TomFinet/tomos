@@ -100,7 +100,7 @@ int page_free(va_t vbase)
 
 	page_table[pte_idx] &= ~PAGE_PRESENT(1);
 	page_tlb_invalid(vbase);
-	bitmap_clear(page_free_map, (pde_idx << PTE_ORDER) + pte_idx);
+	bitmap_clear(page_free_map, PAGE_IDX(vbase));
 	frame_free(PAGE_PA(pte));
 
 	return PAGE_FREE_SUCCESS;
