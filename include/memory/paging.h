@@ -21,9 +21,10 @@
 
 #define PAGE_STD(pa) ((pa) | PAGE_PRESENT(1) | PAGE_RW(1))
 
-#define PAGE_IDX(va) ((va) >> PAGE_ORDER)
-#define PDE_IDX(va)  (PAGE_IDX(va) >> PTE_ORDER)
-#define PTE_IDX(va)  (PAGE_IDX(va) & BITMASK(PTE_ORDER))
+#define PAGE_VA(pidx)	((pidx) << PAGE_ORDER)
+#define PAGE_IDX(va)	((va) >> PAGE_ORDER)
+#define PDE_IDX(pidx)	((pidx) >> PTE_ORDER)
+#define PTE_IDX(pidx)	((pidx) & BITMASK(PTE_ORDER))
 
 /* Page flag checks */
 #define PAGE_PA(pte)    ((pte) & ~0xfff)
