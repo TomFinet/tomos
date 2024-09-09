@@ -14,21 +14,21 @@
 .set _startup_kernel_mapped_pages, 2048
 
 .section .bss.pagetables
-.align 4096
+.align PAGE_NBYTES
 
 .global _page_dir
 _page_dir:
 	.fill KERNEL_PDE_BASE, 4, 0
 kernel_page_dir_start:
-	.fill (1024 - KERNEL_PDE_BASE), 4, 0
+	.fill (PDE_COUNT - KERNEL_PDE_BASE), 4, 0
 
 kernel_page_table_0:
-	.fill 1024, 4, 0
+	.fill PTE_COUNT, 4, 0
 kernel_page_table_1:
-	.fill 1024, 4, 0
+	.fill PTE_COUNT, 4, 0
 
 identity_page_table:
-	.fill 1024, 4, 0
+	.fill PTE_COUNT, 4, 0
 
 .section .text.low
 .global _start
@@ -51,7 +51,7 @@ _start:
 	movl %eax, kernel_page_dir_start
 
 	movl $kernel_page_table_1, %eax
-	movl $(1024 * 4096), %ebx
+	movl $(PTE_COUNT * PAGE_NBYTES), %ebx
 	call map_page_table
 
 	orl $3, %eax
@@ -76,8 +76,8 @@ map_page_table:
 next:
 	movl %ebx, (%eax, %ecx, 4)
 	incl %ecx
-	addl $4096, %ebx
-	cmp $1024, %ecx
+	addl $PAGE_NBYTES, %ebx
+	cmp $PTE_COUNT, %ecx
 	jl next 
 	ret
 
