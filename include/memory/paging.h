@@ -27,8 +27,8 @@
 
 /* Page flag checks */
 #define PAGE_PA(pte)    ((pte) & ~0xfff)
-#define IS_PRESENT(pte) ((pte) & 0x1)
-#define IS_RW(pte)      ((pte) & 0x2)
+#define IS_PRESENT(pte) BITGET(pte, 0)
+#define IS_RW(pte)      BITGET(pte, 1)
 
 #define PAGE_FREE_SUCCESS 1
 #define PAGE_ALREADY_FREE -1
