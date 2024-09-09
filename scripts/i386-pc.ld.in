@@ -43,7 +43,7 @@ SECTIONS
 	.bss ALIGN(4K) : AT(ADDR(.bss) - KERNEL_VA_BASE) {
 		*(COMMON)
 		*(.bss)
-		. = ALIGN(0x1000);
+		. = ALIGN(PAGE_NBYTES);
 	}
 
 	_kernel_pa_end = . - KERNEL_VA_BASE;
