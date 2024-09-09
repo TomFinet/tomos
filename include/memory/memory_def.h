@@ -1,15 +1,24 @@
 #pragma once
 
-#define SYSTEM_MEM 0x20000000 /* 512 MiB */
+#include <klib/kbit.h>
 
-#define KERNEL_PA_BASE 0x00200000 /* 2MB */
+#define SYSTEM_MEM MiB(512)
+
+#define KERNEL_PA_BASE MiB(2)
 #define KERNEL_VA_BASE 0xC0000000 /* 3GB */
 
 #define FRAME_ORDER 12
-#define PAGE_ORDER 12
-#define PTE_ORDER 10
-#define PDE_ORDER 10
+#define PAGE_ORDER  12
+#define PTE_ORDER   10
+#define PDE_ORDER   10
 
 #define KERNEL_PDE_BASE (KERNEL_VA_BASE >> (PTE_ORDER + PAGE_ORDER))
 #define KERNEL_PTE_BASE (KERNEL_VA_BASE >> PAGE_ORDER)
 
+#define PAGE_NBYTES BIT(PAGE_ORDER)
+#define PTE_COUNT   BIT(PTE_ORDER)
+#define PDE_COUNT   BIT(PDE_ORDER)
+#define PAGE_COUNT  BIT(PDE_ORDER + PTE_ORDER)
+
+#define FRAME_NBYTES BIT(FRAME_ORDER)
+#define FRAME_COUNT  (SYSTEM_MEM >> FRAME_ORDER)

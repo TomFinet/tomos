@@ -6,13 +6,13 @@ static isr_t _isr[ISR_NUM];
 
 // TODO: isr should not know internals of PF handler
 // move to different file in memory dir
-static void page_fault_handler(struct isr_frame* frame)
+static void page_fault_handler(struct isr_frame *frame)
 {
 	isr_print_frame(frame);
 	kpanic();
 }
 
-void isr_print_frame(struct isr_frame* frame)
+void isr_print_frame(struct isr_frame *frame)
 {
 	fprintk("\nisr_num: %d, error code: %d\n"
 		"old ds: %h, old cs: %h\n"
@@ -21,13 +21,9 @@ void isr_print_frame(struct isr_frame* frame)
 		"esi: %h, edi: %h\n"
 		"eip: %h\n"
 		"eflags: %b\n\n",
-		frame->isr_num, frame->err_code,
-		frame->ds, frame->cs,
-		frame->eax, frame->ecx, frame->edx,
-		frame->ebx, frame->esp_old, frame->ebp,
-		frame->esi, frame->edi,
-		frame->eip,
-		frame->eflags);
+		frame->isr_num, frame->err_code, frame->ds, frame->cs,
+		frame->eax, frame->ecx, frame->edx, frame->ebx, frame->esp_old,
+		frame->ebp, frame->esi, frame->edi, frame->eip, frame->eflags);
 }
 
 void isr_master(struct isr_frame frame)

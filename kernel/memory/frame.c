@@ -31,7 +31,7 @@ void frame_init(void)
 		mem_map[b] = ALL_SET;
 		/* TODO: initialise the frame struct list? */
 	}
-	
+
 	int part_blk_idx = BITMAP_POS(kernel_frame_cnt);
 	if (part_blk_idx) {
 		mem_map[bitmap_blks_needed - 1] &= (1 << part_blk_idx) - 1;
@@ -54,7 +54,7 @@ void frame_free(pa_t frame)
 	bitmap_clear(mem_map, frame >> FRAME_ORDER);
 }
 
-struct frame_t* frame_from_pa(pa_t frame)
+struct frame_t *frame_from_pa(pa_t frame)
 {
 	return &frames[frame >> FRAME_ORDER];
 }

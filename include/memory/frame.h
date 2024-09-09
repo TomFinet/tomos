@@ -10,13 +10,6 @@
 
 #include <stddef.h>
 
-/* Kernel's physical memory manager.
- * Implements single page frame allocation. */
-
-#define FRAME_NBYTES BIT(FRAME_ORDER)
-#define FRAME_COUNT (SYSTEM_MEM >> FRAME_ORDER)
-
-/* Physical frame descriptor. */
 struct frame_t {
 	struct kslab_t *slab;
 	uint32_t flags;
@@ -25,5 +18,5 @@ struct frame_t {
 void frame_init(void);
 pa_t frame_alloc(void);
 void frame_free(pa_t frame);
-struct frame_t* frame_from_pa(pa_t frame);
+struct frame_t *frame_from_pa(pa_t frame);
 bool frame_is_free(int idx);

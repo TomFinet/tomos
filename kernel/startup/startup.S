@@ -105,5 +105,5 @@ kernel_higher:
 
 # grows from high to low address
 stack_bottom:
-.skip 16384 # 16 KiB
+.skip KiB(16) # 16384 Bytes
 stack_top:
