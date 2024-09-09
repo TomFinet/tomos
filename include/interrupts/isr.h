@@ -11,8 +11,8 @@ struct isr_frame {
 	uint32_t eip, cs, eflags;
 };
 
-typedef void (*isr_t)(struct isr_frame*);
+typedef void (*isr_t)(struct isr_frame *);
 
 void isr_init(void);
 void isr_register(int isr_num, isr_t isr);
-void isr_print_frame(struct isr_frame* frame);
+void isr_print_frame(struct isr_frame *frame);

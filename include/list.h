@@ -21,10 +21,7 @@ struct list_head {
 	struct list_head *prev, *next;
 };
 
-#define LIST_HEAD_INIT(list)                                                   \
-	{                                                                      \
-		&(list), &(list)                                               \
-	}
+#define LIST_HEAD_INIT(list) {&(list), &(list)}
 
 void list_add(struct list_head *prev, struct list_head *new);
 

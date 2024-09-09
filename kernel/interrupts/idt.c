@@ -3,7 +3,7 @@
 
 struct idt_gate gates[IDT_GATE_NUM];
 static struct idt_ptr idtr = {sizeof(struct idt_gate) * IDT_GATE_NUM - 1,
-			(uint32_t)&gates};
+			      (uint32_t)&gates};
 
 void idt_create_descriptor(uint8_t i, uint32_t offset, uint16_t ss,
 			   uint8_t flags)

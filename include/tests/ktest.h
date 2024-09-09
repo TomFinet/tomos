@@ -9,10 +9,7 @@
 
 #include <klib/kstdio.h>
 
-#define KTEST(name)                                                            \
-	{                                                                      \
-		#name, name, true                                              \
-	}
+#define KTEST(name) {#name, name, true}
 
 #define KTEST_SUITE(suite)                                                     \
 	static struct ktest_suite_t *__test_suite_##suite                      \

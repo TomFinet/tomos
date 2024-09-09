@@ -2,7 +2,7 @@
 
 struct gdt_entry gdt_entries[GDT_ENTRY_NUM];
 struct gdt_ptr gdtr = {(sizeof(struct gdt_entry) * GDT_ENTRY_NUM) - 1,
-					 (va_t)&gdt_entries};
+		       (va_t)&gdt_entries};
 
 void create_descriptor(uint8_t i, uint32_t base, uint32_t limit, uint16_t flags)
 {
