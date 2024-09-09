@@ -33,13 +33,13 @@ void page_init(void)
 		SYMBOL_READ(_startup_kernel_mapped_pages, int);
 
 	int i = 0;
-	for (; i < BITMAP_BLK(startup_kernel_mapped_pages); i++) {
-		page_free_map[BITMAP_BLKS(KERNEL_PTE_BASE) + i] = ALL_SET;
+	for (; i < BITMAP_BLKS(startup_kernel_mapped_pages); i++) {
+		page_free_map[BITMAP_BLK(KERNEL_PTE_BASE) + i] = ALL_SET;
 	}
 
 	int part_blk_idx = BITMAP_POS(startup_kernel_mapped_pages);
 	if (part_blk_idx) {
-		page_free_map[BITMAP_BLKS(KERNEL_PTE_BASE) + i] =
+		page_free_map[BITMAP_BLK(KERNEL_PTE_BASE) + i] =
 			(1 << part_blk_idx) - 1;
 	}
 	init_done = true;
@@ -47,16 +47,14 @@ void page_init(void)
 
 void *page_alloc(void)
 {
-	int bitmap_offset = BITMAP_BLKS(KERNEL_PTE_BASE);
-	int start_page_num = KERNEL_PTE_BASE;
-
+	int bitmap_offset = BITMAP_BLK(KERNEL_PTE_BASE);
 	int res = bitmap_first_clear(page_free_map + bitmap_offset,
-				     PAGE_COUNT - start_page_num + 1);
+				     PAGE_COUNT - KERNEL_PTE_BASE + 1);
 	if (res == NOT_FOUND) {
 		return NULL;
 	}
 
-	int free_page_num = start_page_num + res;
+	int free_page_num = KERNEL_PTE_BASE + res;
 	int pde_idx = PDE_IDX(free_page_num);
 	int pte_idx = PTE_IDX(free_page_num);
 
