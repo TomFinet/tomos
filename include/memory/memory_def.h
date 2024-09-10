@@ -6,6 +6,7 @@
 
 #define KERNEL_PA_BASE MiB(2)
 #define KERNEL_VA_BASE 0xC0000000 /* 3GB */
+#define KERNEL_VA_TOP 0xffffffff
 
 #define FRAME_ORDER 12
 #define PAGE_ORDER  12
