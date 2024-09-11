@@ -7,7 +7,6 @@ SYMBOL_DEFINE(kernel_pa_end, pa_t);
 
 static void suite_init(void)
 {
-	kernel_pa_end = SYMBOL_READ(_kernel_pa_end, pa_t);
 	frame_init();
 }
 

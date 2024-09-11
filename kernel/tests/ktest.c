@@ -1,14 +1,12 @@
 #include <tests/ktest.h>
+#include <ksymbol.h>
 
 /* addresses of start and end of linker section containing
 a contiguous block of struct ktest_case_t test cases. */
-extern uint32_t _ktest_start;
-extern uint32_t _ktest_end;
+SYMBOL_DEFINE(ktest_start, struct ktest_suite_t **);
+SYMBOL_DEFINE(ktest_end, struct ktest_suite_t **);
 
 bool curr_test_passing = true;
-
-struct ktest_suite_t **suite_block_start;
-struct ktest_suite_t **suite_block_end;
 
 static inline void ktest_print_suite_header(struct ktest_suite_t *suite)
 {
@@ -28,15 +26,12 @@ static void ktest_print_case_result(struct ktest_case_t *tcase)
 
 void ktest_init(void)
 {
-	/* _ktest_start is a ptr to a ptr to the first suite */
-	suite_block_start = (struct ktest_suite_t **)&_ktest_start;
-	suite_block_end = (struct ktest_suite_t **)&_ktest_end;
 }
 
 void ktest_run_all()
 {
-	struct ktest_suite_t **suite = suite_block_start;
-	for (; suite < suite_block_end; suite++) {
+	struct ktest_suite_t **suite = ktest_start;
+	for (; suite < ktest_end; suite++) {
 		ktest_run_suite(*suite);
 	}
 }
