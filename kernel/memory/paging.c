@@ -1,12 +1,16 @@
+#include <memory/page_table.h>
 #include <memory/paging.h>
+#include <memory/zone.h>
 
 #include <klib/kbitmap.h>
 #include <klib/kstring.h>
 
 #include <ksymbol.h>
 
+#include <stdbool.h>
+
 SYMBOL_DEFINE(page_dir, pde_t *);
-SYMBOL_DEFINE(startup_kernel_mapped_pages, int);
+SYMBOL_DEFINE(kernel_va_end, va_t);
 
 // TODO: bitmap or free list to manage 2^20 pages?
 BITMAP(page_free_map, PAGE_COUNT);
@@ -28,20 +32,12 @@ void page_init(void)
 		return;
 	}
 
-	page_dir = (pde_t *)__va(SYMBOL_READ(_page_dir, pa_t));
-	startup_kernel_mapped_pages =
-		SYMBOL_READ(_startup_kernel_mapped_pages, int);
-
-	int i = 0;
-	for (; i < BITMAP_BLKS(startup_kernel_mapped_pages); i++) {
-		page_free_map[BITMAP_BLK(KERNEL_PTE_BASE) + i] = ALL_SET;
+	int kstart_page_idx = PAGE_IDX(KERNEL_VA_BASE);
+	int kend_page_idx = PAGE_IDX(kernel_va_end);
+	for (int i = kstart_page_idx; i < kend_page_idx; i++) {
+		bitmap_set(page_free_map, i);
 	}
 
-	int part_blk_idx = BITMAP_POS(startup_kernel_mapped_pages);
-	if (part_blk_idx) {
-		page_free_map[BITMAP_BLK(KERNEL_PTE_BASE) + i] =
-			(1 << part_blk_idx) - 1;
-	}
 	init_done = true;
 }
 
