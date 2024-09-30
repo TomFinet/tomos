@@ -5,6 +5,8 @@
 
 #include <klib/kbit.h>
 
+typedef int pg_idx_t;
+
 #define PAGE_VA(pidx)	((pidx) << PAGE_ORDER)
 #define PAGE_IDX(va)	((va) >> PAGE_ORDER)
 
@@ -15,5 +17,5 @@
 
 void *page_alloc();
 int page_free(va_t vbase);
-struct frame_t *page_descriptor(void *va);
+frame_t *page_descriptor(void *va);
 void page_init(void);

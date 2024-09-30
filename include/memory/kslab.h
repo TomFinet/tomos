@@ -1,6 +1,6 @@
 #pragma once
 
-#include <memory/paging.h>
+#include <memory/page_alloc.h>
 #include <klib/kstring.h>
 #include <list.h>
 
