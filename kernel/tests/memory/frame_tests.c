@@ -1,5 +1,6 @@
 #include <memory/frame.h>
 #include <memory/paging.h>
+#include <memory/page_alloc.h>
 #include <tests/ktest.h>
 #include <ksymbol.h>
 
@@ -7,7 +8,6 @@ SYMBOL_DEFINE(kernel_pa_end, pa_t);
 
 static void suite_init(void)
 {
-	frame_init();
 }
 
 static void suite_exit(void)
@@ -16,11 +16,10 @@ static void suite_exit(void)
 
 void test_frame_kernel_alloc(void)
 {
-	frame_init();
+	page_init();
 	int i = 0;
-	while (i * FRAME_NBYTES < kernel_pa_end) {
+	for (; i * FRAME_NBYTES < kernel_pa_end; i++) {
 		ASSERT(!frame_is_free(i));
-		i++;
 	}
 	ASSERT(frame_is_free(i));
 }

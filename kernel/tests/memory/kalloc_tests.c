@@ -1,12 +1,12 @@
 #include <memory/kslab.h>
 #include <memory/frame.h>
 #include <memory/paging.h>
+#include <memory/page_alloc.h>
 #include <memory/kalloc.h>
 #include <tests/ktest.h>
 
 static void suite_init(void)
 {
-	frame_init();
 	page_init();
 	kcache_init();
 }
@@ -18,7 +18,7 @@ static void suite_exit(void)
 static void test_kmalloc()
 {
 	void *mem = kmalloc(4);
-	struct kslab_t *slab = page_descriptor(mem)->slab;
+	struct kslab_t *slab = pg_linear_descriptor((va_t)mem)->slab;
 	struct kcache_t *cache =
 		list_entry(slab->list.next, struct kcache_t, slab_partial);
 	ASSERT(cache->objsize == 4);

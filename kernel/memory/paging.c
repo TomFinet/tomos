@@ -9,21 +9,10 @@
 
 #include <stdbool.h>
 
-SYMBOL_DEFINE(page_dir, pde_t *);
 SYMBOL_DEFINE(kernel_va_end, va_t);
 
 // TODO: bitmap or free list to manage 2^20 pages?
 BITMAP(page_free_map, PAGE_COUNT);
-
-static inline void page_zero(pte_t *page_table)
-{
-	memset((void *)page_table, 0, PTE_COUNT * sizeof(pte_t));
-}
-
-static inline void page_tlb_invalid(va_t va)
-{
-	asm volatile("invlpg %0" : : "m"(va) : "memory");
-}
 
 static bool init_done = false;
 void page_init(void)
@@ -32,16 +21,25 @@ void page_init(void)
 		return;
 	}
 
-	int kstart_page_idx = PAGE_IDX(KERNEL_VA_BASE);
-	int kend_page_idx = PAGE_IDX(kernel_va_end);
-	for (int i = kstart_page_idx; i < kend_page_idx; i++) {
-		bitmap_set(page_free_map, i);
+	pg_idx_t kstart_page_idx = PAGE_IDX(KERNEL_VA_BASE);
+	pg_idx_t kend_page_idx = PAGE_IDX(kernel_va_end);
+	fr_idx_t kstart_fr_idx = ZONE_LINEAR_FRAME_IDX(kstart_page_idx);
+	fr_idx_t kend_fr_idx = ZONE_LINEAR_FRAME_IDX(kend_page_idx);
+
+	// mark pages in linear zone occupied by bootloader + kernel as used
+	// setting the corresponding page table mappings if not already done
+	zone_t *zone_linear = get_zone_linear();
+	zone_mark_pages_used(zone_linear, kstart_page_idx, kend_page_idx);
+
+	// mark the corresponding page frames as used
+	for (fr_idx_t i = kstart_fr_idx; i < kend_fr_idx; i++) {
+		alloc_frame(i);
 	}
 
 	init_done = true;
 }
 
-void *page_alloc(void)
+/*void *page_alloc(void)
 {
 	int bitmap_offset = BITMAP_BLK(KERNEL_PTE_BASE);
 	int res = bitmap_first_clear(page_free_map + bitmap_offset,
@@ -99,10 +97,4 @@ int page_free(va_t vbase)
 	frame_free(PAGE_PA(pte));
 
 	return PAGE_FREE_SUCCESS;
-}
-
-struct frame_t *page_descriptor(void *va)
-{
-	pa_t page_frame_addr = __pa((va_t)va);
-	return frame_from_pa(page_frame_addr);
-}
+}*/

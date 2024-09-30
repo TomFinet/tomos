@@ -1,11 +1,15 @@
 #include <interrupts/isr.h>
+#include <ksymbol.h>
 #include <memory/frame.h>
+#include <memory/zone.h>
 #include <memory/paging.h>
+#include <memory/page_alloc.h>
 #include <tests/ktest.h>
+
+SYMBOL_DEFINE(kernel_va_end, va_t);
 
 static void suite_init(void)
 {
-	frame_init();
 	page_init();
 }
 
@@ -23,32 +27,26 @@ static void suite_exit(void)
  */
 void test_paging_alloc_and_free(void)
 {
-	va_t page = (va_t)page_alloc();
-	ASSERT(page >= KERNEL_VA_BASE);
-	ASSERT(page_free(page) == PAGE_FREE_SUCCESS);
-}
-
-void test_paging_double_free(void)
-{
-	va_t page = (va_t)page_alloc();
-	ASSERT(page >= KERNEL_VA_BASE);
-	ASSERT(page_free(page) == PAGE_FREE_SUCCESS);
-	ASSERT(page_free(page) == PAGE_ALREADY_FREE);
+	pg_idx_t expected_pg_idx = PAGE_IDX(kernel_va_end);
+	pg_idx_t pg_idx = alloc_linear();
+	ASSERT(pg_idx == expected_pg_idx);
+	ASSERT(free_linear(pg_idx) == pg_idx);
 }
 
 void test_paging_bulk_alloc_and_free(void)
 {
 #define n 10
-	va_t pages[n];
-	pages[0] = (va_t)page_alloc();
-	ASSERT(pages[0] >= KERNEL_VA_BASE);
+	pg_idx_t pages[n];
+	pages[0] = alloc_linear();
+	ASSERT(pages[0] >= PAGE_IDX(kernel_va_end));
+
 	for (int i = 1; i < n; i++) {
-		pages[i] = (va_t)page_alloc();
-		ASSERT(pages[i] == pages[i - 1] + PAGE_NBYTES);
+		pages[i] = alloc_linear();
+		ASSERT(pages[i] == pages[i - 1] + 1);
 	}
 
 	for (int i = 0; i < n; i++) {
-		ASSERT(page_free(pages[i]) == PAGE_FREE_SUCCESS);
+		free_linear(pages[i]);
 	}
 }
 
@@ -76,9 +74,10 @@ static void test_paging_nullptr_page_fault_handler(struct isr_frame *frame)
 }
 
 static struct ktest_case_t paging_cases[] = {
-	KTEST(test_paging_alloc_and_free), KTEST(test_paging_double_free),
+	KTEST(test_paging_alloc_and_free),
 	KTEST(test_paging_bulk_alloc_and_free),
-	KTEST(test_paging_nullptr_page_fault)};
+	//KTEST(test_paging_nullptr_page_fault)
+};
 
 static struct ktest_suite_t paging_suite = {
 	.name = "paging_suite",

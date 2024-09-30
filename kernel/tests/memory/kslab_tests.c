@@ -1,5 +1,6 @@
 #include <list.h>
 #include <memory/kslab.h>
+#include <memory/paging.h>
 #include <tests/ktest.h>
 
 struct test_t {
@@ -18,7 +19,6 @@ struct kcache_t cache_test = {
 
 void suite_init(void)
 {
-	frame_init();
 	page_init();
 	kcache_init();
 }
@@ -54,9 +54,9 @@ static void test_kcache_grow(void)
 static void test_page_descr_knows_slab(void)
 {
 	struct kslab_t *slab = kcache_grow(&cache_test, 1);
-	struct frame_t *descriptor = page_descriptor(slab);
+	frame_t *descriptor = pg_linear_descriptor((va_t)slab);
 	ASSERT(descriptor->slab == slab);
-	descriptor = page_descriptor(slab + 1);
+	descriptor = pg_linear_descriptor((va_t)(slab + 1));
 	ASSERT(descriptor->slab == slab);
 }
 
@@ -93,7 +93,7 @@ static void test_kcache_bulk_alloc_free(void)
 	struct kslab_t *slab = kcache_grow(&cache_test, 1);
 
 	const int capacity = slab->freenum;
-	va_t *alloced = page_alloc();
+	va_t *alloced = (va_t *)PAGE_VA(alloc_linear());
 	for (int i = 0; i < capacity; i++) {
 		alloced[i] = (va_t)kcache_alloc(&cache_test);
 	}

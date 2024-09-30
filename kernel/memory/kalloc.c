@@ -11,6 +11,6 @@ void *kmalloc(size_t nbytes)
 
 void kfree(void *obj)
 {
-	struct kslab_t *slab = page_descriptor(obj)->slab;
+	struct kslab_t *slab = pg_linear_descriptor((va_t)obj)->slab;
 	kcache_free(slab, obj);
 }

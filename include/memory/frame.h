@@ -1,4 +1,5 @@
 #pragma once
+
 #include <stdbool.h>
 
 #include <memory/address.h>
@@ -10,13 +11,18 @@
 
 #include <stddef.h>
 
-struct frame_t {
+typedef int fr_idx_t;
+
+typedef struct frame_struct {
 	struct kslab_t *slab;
 	uint32_t flags;
-};
+} frame_t;
 
-void frame_init(void);
+frame_t *alloc_frame(fr_idx_t fr_idx);
+frame_t *free_frame(fr_idx_t fr_idx);
+
 pa_t frame_alloc(void);
 void frame_free(pa_t frame);
-struct frame_t *frame_from_pa(pa_t frame);
+frame_t *frame_from_idx(fr_idx_t fr_idx);
+frame_t *frame_from_pa(pa_t frame);
 bool frame_is_free(int idx);

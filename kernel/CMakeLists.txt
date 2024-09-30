@@ -8,7 +8,10 @@ SET(KERNEL_SRCS
 	memory/gdt.s
 	memory/gdt.c
 	memory/frame.c
+	memory/zone.c
 	memory/paging.c
+	memory/page_alloc.c
+	memory/page_table.c
   	memory/kslab.c
   	memory/kalloc.c
 
@@ -32,9 +35,9 @@ if(KTESTS)
 		tests/ktest.c
 		tests/klib/kbitmap_tests.c
 		tests/memory/frame_tests.c
-    	tests/memory/paging_tests.c
-    	tests/memory/kslab_tests.c
-    	tests/memory/kalloc_tests.c
+		tests/memory/paging_tests.c
+		tests/memory/kslab_tests.c
+		tests/memory/kalloc_tests.c
 		tests/ktest_entry.c
 	)
 else()

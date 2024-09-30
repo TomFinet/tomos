@@ -2,6 +2,8 @@
 
 #include <klib/kbit.h>
 
+#include <memory/paging.h>
+
 #include <stdint.h>
 
 /* Page flags */
@@ -30,8 +32,10 @@ typedef uint32_t pte_t;
 /* page directory entry */
 typedef uint32_t pde_t;
 
-/*
- * Maps a page into the page table
- * corresponding with the virtual address
- */
-//int page_table_map(va_t page, pte_t pte);
+pde_t read_pde(pg_idx_t pg_idx);
+pte_t *get_pg_table(pde_t pde, pg_idx_t pg_idx);
+pte_t read_pte(pde_t pde, pg_idx_t pg_idx);
+pde_t map_pde_for_pg(pg_idx_t pg_idx, fr_idx_t fr_idx);
+pte_t map_pte_for_pg(pde_t pde, pg_idx_t pg_idx, fr_idx_t fr_idx);
+pte_t unmap_pte_for_pg(pde_t pde, pg_idx_t pg_idx);
+void invlpg(pg_idx_t pg_idx);
