@@ -3,6 +3,8 @@
 
 #include <memory/zone.h>
 #include <memory/page_table.h>
+#include <memory/page_alloc.h>
+#include <ksymbol.h>
 
 #include <panic.h>
 
@@ -61,11 +63,6 @@ static void mark_pg_free_linear(pg_idx_t pg_idx)
 	}
 }
 
-static inline void zero_pg(pg_idx_t pg_idx)
-{
-	void *pg = (void *)PAGE_VA(pg_idx);
-	memset(pg, 0, PAGE_NBYTES);
-}
 /*
  * Allocates a page of virtual memory which is mapped linearly
  * to physical memory.
@@ -84,17 +81,40 @@ pg_idx_t alloc_linear(void)
 		return NOT_FOUND;
 	}
 
-	fr_idx_t fr_idx = ZONE_LINEAR_FRAME_IDX(pg_idx);
-	pde_t pde = read_pde(pg_idx);
+	pde_t pde = read_pde_for_pg(pg_idx);
 
 	if (!IS_PRESENT(pde)) {
-		pg_idx_t pg_table_idx = mark_pg_used_linear();
-		fr_idx_t fr_table_idx = ZONE_LINEAR_FRAME_IDX(pg_table_idx);
-		pde = map_pde_for_pg(pg_table_idx, fr_table_idx);
-		zero_pg(pg_table_idx);
+		alloc_pg_table(pg_idx);
+		pde = read_pde_for_pg(pg_idx);
+		return pg_idx;
 	}
 
+	// assume that page table exists in linear
+	fr_idx_t fr_idx = ZONE_LINEAR_FRAME_IDX(pg_idx);
 	map_pte_for_pg(pde, pg_idx, fr_idx);
+
+	return pg_idx;
+}
+
+// INVESTIGATE THIS FUNCTION
+pg_idx_t alloc_pg_table(pg_idx_t pg_idx)
+{
+	pg_idx_t pg_table_idx = mark_pg_used_linear();
+
+	if (pg_table_idx == NOT_FOUND) {
+		return NOT_FOUND;
+	}
+
+	fr_idx_t fr_table_idx = ZONE_LINEAR_FRAME_IDX(pg_table_idx);
+	pte_t *tmp_pg_table = get_tmp_mapping(fr_table_idx << PAGE_ORDER);
+
+	fr_idx_t fr_idx = ZONE_LINEAR_FRAME_IDX(pg_idx);
+	fr_idx_t start_fr = fr_idx & ~BITMASK(PTE_ORDER);
+
+	map_linear_pg_table(tmp_pg_table, start_fr);
+	unmap_tmp_pg(PAGE_IDX((va_t)tmp_pg_table));
+
+	map_pde_for_pg(pg_idx, fr_table_idx);
 	return pg_idx;
 }
 
@@ -102,7 +122,7 @@ pg_idx_t free_linear(pg_idx_t pg_to_free)
 {
 	mark_pg_free_linear(pg_to_free);
 	// TODO: assert that pde is present
-	pde_t pde = read_pde(pg_to_free);
+	pde_t pde = read_pde_for_pg(pg_to_free);
 	unmap_pte_for_pg(pde, pg_to_free);
 
 	// TODO: if the free request, sets the last page entry in page table to non-present
