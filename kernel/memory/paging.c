@@ -1,5 +1,6 @@
 #include <memory/page_table.h>
 #include <memory/page_alloc.h>
+#include <memory/pg_tmp.h>
 #include <memory/paging.h>
 #include <memory/zone.h>
 
@@ -47,7 +48,7 @@ void page_init(void)
 	fr_idx_t tmp_table_fr_idx = ZONE_LINEAR_FRAME_IDX(tmp_table_pg_idx);
 	pa_t tmp_table_fr_pa = tmp_table_fr_idx << PAGE_ORDER;
 	pde_t tmp_table_pde = PAGE_STD(tmp_table_fr_pa);
-	write_pde(5, tmp_table_pde); // lets just use 5 as the pde idx corresponding to tmp table
+	write_pde(TMP_PG_TABLE_PDE, tmp_table_pde);
 
 	init_done = true;
 }

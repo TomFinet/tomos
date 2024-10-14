@@ -1,72 +1,34 @@
 #include <memory/page_table.h>
+#include <memory/pg_tmp.h>
 #include <memory/zone.h>
 #include <ksymbol.h>
 
 SYMBOL_PA_DEFINE(page_dir, pde_t *);
-// Virtual address of the temporary page table which exists in linear memory.
-SYMBOL_PA_DEFINE(tmp_pg_table, pte_t *);
 
 void write_pde(unsigned int pde_idx, pde_t pde)
 {
 	page_dir[pde_idx] = pde;
 }
 
-pde_t read_pde(unsigned int pde_idx) {
-	return page_dir[pde_idx];
-}
-
 pde_t read_pde_for_pg(pg_idx_t pg_idx)
 {
 	int pde_idx = PDE_IDX(pg_idx);
-	pde_t pde = page_dir[pde_idx];
-	return pde;
+	return read_pde(pde_idx);
 }
 
-pte_t *get_tmp_mapping(pde_t pde)
+pde_t read_pde(unsigned int pde_idx)
 {
-	pa_t pa = PAGE_PA(pde);
-	fr_idx_t fr_idx = PAGE_IDX(pa);
-	unsigned int tmp_pte_idx = map_tmp_pg(fr_idx);
-
-	if (tmp_pte_idx == NOT_FOUND) {
-		return NULL;
-	}
-
-	va_t tmp_pg_va = (5 << (PAGE_ORDER + PTE_ORDER)) + (tmp_pte_idx << PAGE_ORDER);
-	return (void *)tmp_pg_va;
+	return page_dir[pde_idx];
 }
 
 pte_t read_pte(pde_t pde, pg_idx_t pg_idx)
 {
 	int pte_idx = PTE_IDX(pg_idx);
-	pte_t *pg_table = get_tmp_mapping(pde);
+	pg_idx_t pg_table_pg_idx = alloc_tmp_pg(PAGE_PA(pde));
+	pte_t *pg_table = (pte_t *)PAGE_VA(pg_table_pg_idx);
 	pte_t pte = pg_table[pte_idx];
-	unmap_tmp_pg(PAGE_IDX((va_t)pg_table));
+	free_tmp_pg(pg_table_pg_idx);
 	return pte;
-}
-
-unsigned int map_tmp_pg(fr_idx_t fr_idx)
-{
-	for (unsigned int pte_idx = 0; pte_idx < PTE_COUNT; pte_idx++) {
-		if (!IS_PRESENT(tmp_pg_table[pte_idx])) {
-			map_pte(tmp_pg_table, pte_idx, fr_idx);
-			return pte_idx;
-		}
-	}
-	return NOT_FOUND;
-}
-
-pte_t unmap_tmp_pg(pg_idx_t pg_idx)
-{
-	// assert pg is in tmp range
-	return unmap_pte(tmp_pg_table, pg_idx);
-}
-
-// After startup the tmp page table is set from the
-// identity page table, so mark each pte as free.
-void reset_tmp_pg_table(void)
-{
-	memset(tmp_pg_table, 0, PTE_COUNT * sizeof(pte_t));
 }
 
 pde_t map_pde_for_pg(pg_idx_t pg_idx, fr_idx_t fr_idx)
@@ -80,10 +42,11 @@ pde_t map_pde_for_pg(pg_idx_t pg_idx, fr_idx_t fr_idx)
 
 pte_t map_pte_for_pg(pde_t pde, pg_idx_t pg_idx, fr_idx_t fr_idx)
 {
-	pte_t *pg_table = get_tmp_mapping(pde);
+	pg_idx_t pg_table_pg_idx = alloc_tmp_pg(PAGE_PA(pde));
+	pte_t *pg_table = (pte_t *)PAGE_VA(pg_table_pg_idx);
 	unsigned int pte_idx = PTE_IDX(pg_idx);
 	pte_t pte = map_pte(pg_table, pte_idx, fr_idx);
-	unmap_tmp_pg(PAGE_IDX((va_t)pg_table));
+	free_tmp_pg(pg_table_pg_idx);
 	flush_tlb();
 	return pte;
 }
@@ -97,9 +60,10 @@ pte_t map_pte(pte_t *pg_table, unsigned int pte_idx, fr_idx_t fr_idx)
 
 pte_t unmap_pte_for_pg(pde_t pde, pg_idx_t pg_idx)
 {
-	pte_t *pg_table = get_tmp_mapping(pde);
+	pg_idx_t pg_table_pg_idx = alloc_tmp_pg(PAGE_PA(pde));
+	pte_t *pg_table = (pte_t *)PAGE_VA(pg_table_pg_idx);
 	pte_t pte = unmap_pte(pg_table, pg_idx);
-	unmap_tmp_pg(PAGE_IDX((va_t)pg_table));
+	free_tmp_pg(pg_table_pg_idx);
 	return pte;
 }
 
