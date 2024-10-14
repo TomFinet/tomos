@@ -12,6 +12,7 @@ SET(KERNEL_SRCS
 	memory/paging.c
 	memory/page_alloc.c
 	memory/page_table.c
+	memory/pg_tmp.c
   	memory/kslab.c
   	memory/kalloc.c
 
