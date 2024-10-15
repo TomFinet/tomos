@@ -2,6 +2,7 @@
 #include <memory/pg_tmp.h>
 #include <memory/zone.h>
 #include <ksymbol.h>
+#include <klib/assert.h>
 
 SYMBOL_PA_DEFINE(page_dir, pde_t *);
 
@@ -78,6 +79,7 @@ pte_t unmap_pte(pte_t *pg_table, pg_idx_t pg_idx)
 void map_linear_pg_table(pte_t *pg_table, fr_idx_t fr_idx)
 {
 	// assert fr_idx is aligned with start of pg table
+	assert(!(fr_idx & BITMASK(PTE_ORDER)));
 	for (unsigned int pte_idx = 0; pte_idx < PTE_COUNT; pte_idx++) {
 		pa_t fr_pa = (fr_idx + pte_idx) << PAGE_ORDER;
 		pte_t pte = PAGE_STD(fr_pa);

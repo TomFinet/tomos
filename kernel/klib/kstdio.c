@@ -32,15 +32,27 @@ void vprintk(const char *str, va_list list)
 		bzero(&buffer, sizeof(buffer));
 		char *c;
 
-		uint32_t arg = va_arg(list, uint32_t);
-		if (*str == 'd') {
-			c = itoa(arg, buffer, 10);
-		} else if (*str == 'b') {
-			c = itoa(arg, buffer, 2);
-		} else if (*str == 'h') {
-			c = itoa(arg, buffer, 16);
-		} else {
-			c = &buffer[arg];
+		if(*str == 's') {
+			char *arg = va_arg(list, char *);
+			int i = 0;
+			while (*arg != '\0') {
+				buffer[i] = *arg;
+				i++;
+				arg++;
+			}
+			c = buffer;
+		}
+		else {
+			uint32_t arg = va_arg(list, uint32_t);
+			if (*str == 'd') {
+				c = itoa(arg, buffer, 10);
+			} else if (*str == 'b') {
+				c = itoa(arg, buffer, 2);
+			} else if (*str == 'h') {
+				c = itoa(arg, buffer, 16);
+			} else {
+				c = &buffer[arg];
+			}
 		}
 		printk(c);
 		str++;

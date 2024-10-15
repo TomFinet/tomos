@@ -24,6 +24,7 @@ SET(KERNEL_SRCS
 	klib/kstdio.c
 	klib/kstring.c
   	klib/kmath.c
+	klib/assert.c
 
 	io.c
 	serial.c

@@ -1,5 +1,6 @@
 #include <klib/kbitmap.h>
 #include <klib/kstring.h>
+#include <klib/assert.h>
 
 #include <memory/zone.h>
 #include <memory/pg_tmp.h>
@@ -111,8 +112,8 @@ pg_idx_t alloc_linear(void)
 pg_idx_t free_linear(pg_idx_t pg_to_free)
 {
 	mark_pg_free_linear(pg_to_free);
-	// TODO: assert that pde is present
 	pde_t pde = read_pde_for_pg(pg_to_free);
+	assert(IS_PRESENT(pde));
 	unmap_pte_for_pg(pde, pg_to_free);
 
 	// TODO: if the free request, sets the last page entry in page table to non-present

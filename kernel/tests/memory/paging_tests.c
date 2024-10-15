@@ -1,5 +1,6 @@
 #include <interrupts/isr.h>
 #include <ksymbol.h>
+#include <klib/assert.h>
 #include <memory/frame.h>
 #include <memory/zone.h>
 #include <memory/paging.h>
