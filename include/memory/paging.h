@@ -15,7 +15,4 @@ typedef int pg_idx_t;
 #define PAGE_FREE_SUCCESS 1
 #define PAGE_ALREADY_FREE -1
 
-void *page_alloc();
-int page_free(va_t vbase);
-frame_t *page_descriptor(void *va);
-void page_init(void);
+void pg_init(void);

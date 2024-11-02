@@ -1,5 +1,6 @@
 #include <interrupts/isr.h>
 #include <ksymbol.h>
+#include <klib/assert.h>
 #include <memory/frame.h>
 #include <memory/zone.h>
 #include <memory/paging.h>
@@ -11,7 +12,7 @@ SYMBOL_DEFINE(kernel_va_end, va_t);
 
 static void suite_init(void)
 {
-	page_init();
+	pg_init();
 }
 
 static void suite_exit(void)

@@ -5,13 +5,16 @@ SET(CMAKE_C_FLAGS "-O0 -ffreestanding -fbuiltin -Wno-write-strings -Wall -mno-re
 SET(KERNEL_SRCS
 	startup/startup.S
 
+	init/pg_init.c
+	init/kslab_init.c
+
 	memory/gdt.s
 	memory/gdt.c
 	memory/frame.c
 	memory/zone.c
-	memory/paging.c
 	memory/page_alloc.c
 	memory/page_table.c
+	memory/pg_tmp.c
   	memory/kslab.c
   	memory/kalloc.c
 
@@ -23,6 +26,7 @@ SET(KERNEL_SRCS
 	klib/kstdio.c
 	klib/kstring.c
   	klib/kmath.c
+	klib/assert.c
 
 	io.c
 	serial.c

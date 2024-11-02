@@ -1,7 +1,9 @@
 #include <klib/kbitmap.h>
 #include <klib/kstring.h>
+#include <klib/assert.h>
 
 #include <memory/zone.h>
+#include <memory/pg_tmp.h>
 #include <memory/page_table.h>
 #include <memory/page_alloc.h>
 #include <ksymbol.h>
@@ -63,16 +65,27 @@ static void mark_pg_free_linear(pg_idx_t pg_idx)
 	}
 }
 
-/*
- * Allocates a page of virtual memory which is mapped linearly
- * to physical memory.
- *
- * Linear zone guarantees that a page can be mapped to a single frame,
- * and a frame can be mapped to a single page. So checking that the
- * zone has a free page, tells us that it must have a free frame.
- * This is not true of other zones (e.g. if virtual mem >> phys mem)
- *
- */
+static pg_idx_t alloc_pg_table(pg_idx_t pg_idx)
+{
+	pg_idx_t pg_table_idx = mark_pg_used_linear();
+
+	if (pg_table_idx == NOT_FOUND) {
+		return NOT_FOUND;
+	}
+
+	fr_idx_t fr_table_idx = ZONE_LINEAR_FRAME_IDX(pg_table_idx);
+	pg_idx_t tmp_pg_table_idx = alloc_tmp_pg(fr_table_idx << PAGE_ORDER);
+	pte_t *tmp_pg_table = (pte_t *)PAGE_VA(tmp_pg_table_idx);
+
+	fr_idx_t fr_idx = ZONE_LINEAR_FRAME_IDX(pg_idx);
+	fr_idx_t start_fr = fr_idx & ~BITMASK(PTE_ORDER);
+	map_linear_pg_table(tmp_pg_table, start_fr);
+
+	free_tmp_pg(tmp_pg_table_idx);
+	map_pde_for_pg(pg_idx, fr_table_idx);
+	return pg_idx;
+}
+
 pg_idx_t alloc_linear(void)
 {
 	pg_idx_t pg_idx = mark_pg_used_linear();
@@ -96,33 +109,11 @@ pg_idx_t alloc_linear(void)
 	return pg_idx;
 }
 
-// INVESTIGATE THIS FUNCTION
-pg_idx_t alloc_pg_table(pg_idx_t pg_idx)
-{
-	pg_idx_t pg_table_idx = mark_pg_used_linear();
-
-	if (pg_table_idx == NOT_FOUND) {
-		return NOT_FOUND;
-	}
-
-	fr_idx_t fr_table_idx = ZONE_LINEAR_FRAME_IDX(pg_table_idx);
-	pte_t *tmp_pg_table = get_tmp_mapping(fr_table_idx << PAGE_ORDER);
-
-	fr_idx_t fr_idx = ZONE_LINEAR_FRAME_IDX(pg_idx);
-	fr_idx_t start_fr = fr_idx & ~BITMASK(PTE_ORDER);
-
-	map_linear_pg_table(tmp_pg_table, start_fr);
-	unmap_tmp_pg(PAGE_IDX((va_t)tmp_pg_table));
-
-	map_pde_for_pg(pg_idx, fr_table_idx);
-	return pg_idx;
-}
-
 pg_idx_t free_linear(pg_idx_t pg_to_free)
 {
 	mark_pg_free_linear(pg_to_free);
-	// TODO: assert that pde is present
 	pde_t pde = read_pde_for_pg(pg_to_free);
+	assert(IS_PRESENT(pde));
 	unmap_pte_for_pg(pde, pg_to_free);
 
 	// TODO: if the free request, sets the last page entry in page table to non-present

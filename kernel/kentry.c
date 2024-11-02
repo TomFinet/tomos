@@ -18,6 +18,6 @@ void kentry(void)
 	serial_init();
 	gdt_init();
 	idt_init();
-	page_init();
+	pg_init();
 	kcache_init();
 }
