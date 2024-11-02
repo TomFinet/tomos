@@ -14,7 +14,7 @@
 typedef int fr_idx_t;
 
 typedef struct frame_struct {
-	struct kslab_t *slab;
+	void *slab;
 	uint32_t flags;
 } frame_t;
 

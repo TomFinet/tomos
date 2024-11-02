@@ -3,23 +3,23 @@
 #include <memory/paging.h>
 #include <tests/ktest.h>
 
-struct test_t {
+typedef struct point_struct {
 	int x;
 	int y;
 	int z;
-};
+} point_t;
 
-struct kcache_t cache_test = {
+kcache_t cache_test = {
 	.slab_free = LIST_HEAD_INIT(cache_test.slab_free),
 	.slab_partial = LIST_HEAD_INIT(cache_test.slab_partial),
 	.slab_full = LIST_HEAD_INIT(cache_test.slab_full),
 	.list = LIST_HEAD_INIT(cache_test.list),
-	.objsize = sizeof(struct test_t),
+	.objsize = sizeof(point_t),
 };
 
 void suite_init(void)
 {
-	page_init();
+	pg_init();
 	kcache_init();
 }
 
@@ -30,7 +30,7 @@ void suite_exit(void)
 static void test_kcache_grow(void)
 {
 	int pagenum = 1;
-	struct kslab_t *slab = kcache_grow(&cache_test, pagenum);
+	kslab_t *slab = kcache_grow(&cache_test, pagenum);
 	ASSERT(slab->pagenum == pagenum);
 	ASSERT(slab->capacity == slab->freenum);
 
@@ -53,7 +53,7 @@ static void test_kcache_grow(void)
 
 static void test_page_descr_knows_slab(void)
 {
-	struct kslab_t *slab = kcache_grow(&cache_test, 1);
+	kslab_t *slab = kcache_grow(&cache_test, 1);
 	frame_t *descriptor = pg_linear_descriptor((va_t)slab);
 	ASSERT(descriptor->slab == slab);
 	descriptor = pg_linear_descriptor((va_t)(slab + 1));
@@ -62,7 +62,7 @@ static void test_page_descr_knows_slab(void)
 
 static void test_kcache_alloc_and_free_obj(void)
 {
-	struct kslab_t *slab = kcache_grow(&cache_test, 1);
+	kslab_t *slab = kcache_grow(&cache_test, 1);
 
 	unsigned int prior_freenum = slab->freenum;
 	void *obj = kcache_alloc(&cache_test);
@@ -74,7 +74,7 @@ static void test_kcache_alloc_and_free_obj(void)
 		ASSERT(slab->free_objs[i] != (va_t)obj);
 	}
 
-	ASSERT(container_of(cache_test.slab_partial.next, struct kslab_t,
+	ASSERT(container_of(cache_test.slab_partial.next, kslab_t,
 			    list) == slab);
 
 	prior_freenum = slab->freenum;
@@ -84,13 +84,13 @@ static void test_kcache_alloc_and_free_obj(void)
 	ASSERT(prior_freenum == after_freenum - 1);
 	ASSERT(slab->free_objs[prior_freenum] == (va_t)obj);
 
-	ASSERT(container_of(cache_test.slab_free.next, struct kslab_t, list) ==
+	ASSERT(container_of(cache_test.slab_free.next, kslab_t, list) ==
 	       slab);
 }
 
 static void test_kcache_bulk_alloc_free(void)
 {
-	struct kslab_t *slab = kcache_grow(&cache_test, 1);
+	kslab_t *slab = kcache_grow(&cache_test, 1);
 
 	const int capacity = slab->freenum;
 	va_t *alloced = (va_t *)PAGE_VA(alloc_linear());

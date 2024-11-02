@@ -12,7 +12,7 @@ SYMBOL_DEFINE(kernel_va_end, va_t);
 
 static void suite_init(void)
 {
-	page_init();
+	pg_init();
 }
 
 static void suite_exit(void)

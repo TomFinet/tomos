@@ -7,7 +7,7 @@
 
 static void suite_init(void)
 {
-	page_init();
+	pg_init();
 	kcache_init();
 }
 
@@ -18,9 +18,9 @@ static void suite_exit(void)
 static void test_kmalloc()
 {
 	void *mem = kmalloc(4);
-	struct kslab_t *slab = pg_linear_descriptor((va_t)mem)->slab;
-	struct kcache_t *cache =
-		list_entry(slab->list.next, struct kcache_t, slab_partial);
+	kslab_t *slab = pg_linear_descriptor((va_t)mem)->slab;
+	kcache_t *cache =
+		list_entry(slab->list.next, kcache_t, slab_partial);
 	ASSERT(cache->objsize == 4);
 }
 

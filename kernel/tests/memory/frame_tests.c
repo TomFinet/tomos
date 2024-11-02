@@ -16,7 +16,7 @@ static void suite_exit(void)
 
 void test_frame_kernel_alloc(void)
 {
-	page_init();
+	pg_init();
 	int i = 0;
 	for (; i * FRAME_NBYTES < kernel_pa_end; i++) {
 		ASSERT(!frame_is_free(i));

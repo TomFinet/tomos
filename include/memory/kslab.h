@@ -9,11 +9,11 @@
 #define KSLAB_SIZE(slabp) (slabp->pagenum * PAGE_NBYTES)
 
 #define KSLAB_CAPACITY(slabp, objsize)                                         \
-	(KSLAB_SIZE(slabp) - sizeof(struct kslab_t) + sizeof(va_t)) /          \
+	(KSLAB_SIZE(slabp) - sizeof(kslab_t) + sizeof(va_t)) /          \
 		(objsize + sizeof(va_t))
 
 #define KSLAB_HEADER_SIZE(slabp, objsize)                                      \
-	(sizeof(struct kslab_t) +                                              \
+	(sizeof(kslab_t) +                                              \
 	 (KSLAB_CAPACITY(slabp, objsize) - 1) * sizeof(va_t))
 
 #define KSLAB_AVAIL_BYTES(slabp) (KSLAB_SIZE(slabp) - KSLAB_HEADER_SIZE(slabp))
@@ -27,7 +27,7 @@
 		.objsize = osize,                                              \
 	};
 
-struct kcache_t {
+typedef struct kcache_struct {
 	/* stores pages of free objects. */
 	struct list_head slab_free;
 	/* stores pages of partially free objects. */
@@ -43,14 +43,14 @@ struct kcache_t {
 	/* constructor and destructor for slab objects. */
 	// void (*ctor)();
 	// void (*dtor)();
-};
+} kcache_t;
 
 /* the slab descriptor is stored on the first page
 allocated to the slab. */
-struct kslab_t {
+typedef struct kslab_struct {
 	/* the slab list this slab belongs to. */
 	struct list_head list;
-	struct kcache_t *belongs_to;
+	kcache_t *belongs_to;
 	/* the start address of the contiguous number of pages. */
 	va_t slab_mem;
 	/* the number of contiguous pages in the slab. */
@@ -59,19 +59,21 @@ struct kslab_t {
 	unsigned int freenum;
 	/* a list of free slab entry addresses. */
 	va_t free_objs[];
-};
+} kslab_t;
 
-/* Initialises the kernel slab memory allocator. */
-void kcache_init();
+void kcache_init(void);
+
+kcache_t *get_cache_cache(void);
+kcache_t **get_cache_arr(void);
 
 /* Adds a cache to the cache list. */
-void kcache_add(struct kcache_t *cache);
+void kcache_add(kcache_t *cache);
 
-void *kcache_alloc(struct kcache_t *cache);
+void *kcache_alloc(kcache_t *cache);
 
-void kcache_free(struct kslab_t *slab, void *obj);
+void kcache_free(kslab_t *slab, void *obj);
 
 /* grow the slab by some number of pages. */
-struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum);
+kslab_t *kcache_grow(kcache_t *cache, unsigned int pagenum);
 
-struct kcache_t *kcache_best_fit(size_t objsize);
+kcache_t *kcache_best_fit(size_t objsize);

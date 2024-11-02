@@ -14,11 +14,8 @@
 SYMBOL_DEFINE(kernel_va_end, va_t);
 SYMBOL_PA_DEFINE(tmp_pg_table, pte_t *);
 
-// TODO: bitmap or free list to manage 2^20 pages?
-BITMAP(page_free_map, PAGE_COUNT);
-
 static bool init_done = false;
-void page_init(void)
+void pg_init(void)
 {
 	if (init_done) {
 		return;

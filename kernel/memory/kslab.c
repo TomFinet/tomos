@@ -10,60 +10,54 @@ embedding this pointer. */
 
 #include <memory/kslab.h>
 
-struct kcache_t cache_cache = {
+static kcache_t cache_cache = {
 	.slab_free = LIST_HEAD_INIT(cache_cache.slab_free),
 	.slab_partial = LIST_HEAD_INIT(cache_cache.slab_partial),
 	.slab_full = LIST_HEAD_INIT(cache_cache.slab_full),
 	.list = LIST_HEAD_INIT(cache_cache.list),
-	.objsize = sizeof(struct kcache_t),
+	.objsize = sizeof(kcache_t),
 };
 
-static struct kcache_t cache_2048 = KCACHE_CREATE(2048);
-static struct kcache_t cache_1024 = KCACHE_CREATE(1024);
-static struct kcache_t cache_512 = KCACHE_CREATE(512);
-static struct kcache_t cache_256 = KCACHE_CREATE(256);
-static struct kcache_t cache_128 = KCACHE_CREATE(128);
-static struct kcache_t cache_64 = KCACHE_CREATE(64);
-static struct kcache_t cache_32 = KCACHE_CREATE(32);
-static struct kcache_t cache_16 = KCACHE_CREATE(16);
-static struct kcache_t cache_8 = KCACHE_CREATE(8);
-static struct kcache_t cache_4 = KCACHE_CREATE(4);
+static kcache_t cache_2048 = KCACHE_CREATE(2048);
+static kcache_t cache_1024 = KCACHE_CREATE(1024);
+static kcache_t cache_512 = KCACHE_CREATE(512);
+static kcache_t cache_256 = KCACHE_CREATE(256);
+static kcache_t cache_128 = KCACHE_CREATE(128);
+static kcache_t cache_64 = KCACHE_CREATE(64);
+static kcache_t cache_32 = KCACHE_CREATE(32);
+static kcache_t cache_16 = KCACHE_CREATE(16);
+static kcache_t cache_8 = KCACHE_CREATE(8);
+static kcache_t cache_4 = KCACHE_CREATE(4);
 
 /* caches used by kmalloc for unregistered objects. */
-static struct kcache_t *cache_size[KCACHE_NUM] = {
+static kcache_t *cache_size[KCACHE_NUM] = {
 	&cache_4,   &cache_8,   &cache_16,  &cache_32,   &cache_64,
 	&cache_128, &cache_256, &cache_512, &cache_1024, &cache_2048,
 };
 
-static bool init_done = false;
-
-void kcache_init()
+kcache_t *get_cache_cache(void)
 {
-	if (init_done) {
-		return;
-	}
-
-	kcache_grow(&cache_cache, 1);
-	for (int i = 0; i < KCACHE_NUM; i++) {
-		kcache_grow(cache_size[i], 1);
-		kcache_add(cache_size[i]);
-	}
-	init_done = true;
+	return &cache_cache;
 }
 
-void kcache_add(struct kcache_t *cache)
+kcache_t **get_cache_arr(void)
+{
+	return cache_size;
+}
+
+void kcache_add(kcache_t *cache)
 {
 	list_add(&cache_cache.list, &cache->list);
 }
 
-struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
+kslab_t *kcache_grow(kcache_t *cache, unsigned int pagenum)
 {
 	if (pagenum == 0) {
 		return NULL;
 	}
 	
 	va_t cache_va = PAGE_VA(alloc_linear());
-	struct kslab_t *slab_free = (struct kslab_t *)cache_va;
+	kslab_t *slab_free = (kslab_t *)cache_va;
 
 	slab_free->pagenum = pagenum;
 	slab_free->capacity = KSLAB_CAPACITY(slab_free, cache->objsize);
@@ -93,15 +87,15 @@ struct kslab_t *kcache_grow(struct kcache_t *cache, unsigned int pagenum)
 	return slab_free;
 }
 
-void *kcache_alloc(struct kcache_t *cache)
+void *kcache_alloc(kcache_t *cache)
 {
-	struct kslab_t *slab;
+	kslab_t *slab;
 
 	if (!list_empty(&cache->slab_partial)) {
-		slab = list_entry(cache->slab_partial.next, struct kslab_t,
+		slab = list_entry(cache->slab_partial.next, kslab_t,
 				  list);
 	} else if (!list_empty(&cache->slab_free)) {
-		slab = list_entry(cache->slab_free.next, struct kslab_t, list);
+		slab = list_entry(cache->slab_free.next, kslab_t, list);
 	} else {
 		slab = kcache_grow(
 			cache,
@@ -127,9 +121,9 @@ void *kcache_alloc(struct kcache_t *cache)
 	return obj;
 }
 
-void kcache_free(struct kslab_t *slab, void *obj)
+void kcache_free(kslab_t *slab, void *obj)
 {
-	struct kcache_t *cache = slab->belongs_to;
+	kcache_t *cache = slab->belongs_to;
 	slab->free_objs[slab->freenum] = (va_t)obj;
 	slab->freenum++;
 
@@ -144,7 +138,7 @@ void kcache_free(struct kslab_t *slab, void *obj)
 	}
 }
 
-struct kcache_t *kcache_best_fit(size_t objsize)
+kcache_t *kcache_best_fit(size_t objsize)
 {
 	unsigned int size = 4;
 	for (int i = 1; i <= KCACHE_NUM; i++) {
